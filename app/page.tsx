@@ -1,65 +1,281 @@
-import Image from "next/image";
+"use client";
+
+import React, { useEffect, useState, useRef } from 'react';
+import Link from 'next/link';
+import { 
+  ArrowUp, 
+  ArrowDown, 
+  Share2, 
+  Heart, 
+  Brain, 
+  Shield, 
+  GraduationCap, 
+  Zap, 
+  Search, 
+  LogOut, 
+  ChevronRight, 
+  ChevronLeft,
+  Trophy,
+  Clock,
+  Bookmark
+} from 'lucide-react';
+import { supabase } from '../lib/supabase'; 
+import ThemeToggle from '../components/ThemeToggle'; 
+
+type SortType = 'top' | 'new' | 'saved';
 
 export default function Home() {
+  const [skills, setSkills] = useState<any[]>([]);
+  const [userVotes, setUserVotes] = useState<{[key: number]: 'up' | 'down' | null}>({});
+  const [userFavorites, setUserFavorites] = useState<number[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [user, setUser] = useState<any>(null);
+  const [searchQuery, setSearchQuery] = useState("");
+  
+  // Track sort state per category
+  const [categorySort, setCategorySort] = useState<{[key: string]: SortType}>({});
+  const scrollRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
+
+  const fetchData = async (currentUser: any) => {
+    // Select created_at for 'New' sorting
+    const { data: skillsData } = await supabase.from('skills').select('*').order('votes', { ascending: false });
+    setSkills(skillsData || []);
+
+    if (currentUser) {
+      const { data: votesData } = await supabase.from('user_votes').select('skill_id, vote_type').eq('user_id', currentUser.id);
+      const voteMap = (votesData || []).reduce((acc, v) => ({ ...acc, [v.skill_id]: v.vote_type }), {});
+      setUserVotes(voteMap);
+
+      const { data: favData } = await supabase.from('user_favorites').select('skill_id').eq('user_id', currentUser.id);
+      setUserFavorites(favData?.map(f => f.skill_id) || []);
+    }
+    setLoading(false);
+  };
+
+  useEffect(() => {
+    const init = async () => {
+      const { data: { user: activeUser } } = await supabase.auth.getUser();
+      setUser(activeUser);
+      fetchData(activeUser);
+    };
+    init();
+    const { data: authListener } = supabase.auth.onAuthStateChange((_event, session) => {
+      const newUser = session?.user ?? null;
+      setUser(newUser);
+      fetchData(newUser);
+    });
+    return () => authListener.subscription.unsubscribe();
+  }, []);
+
+  const scroll = (category: string, direction: 'left' | 'right') => {
+    const container = scrollRefs.current[category];
+    if (container) {
+      const scrollAmount = direction === 'left' ? -350 : 350;
+      container.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+    }
+  };
+
+  // Process skills based on active sort/filter
+  const getProcessedSkills = (categoryName: string, categorySkills: any[]) => {
+    const sortType = categorySort[categoryName] || 'top';
+    let filtered = [...categorySkills];
+
+    if (sortType === 'saved') {
+      filtered = filtered.filter(s => userFavorites.includes(s.id));
+    }
+
+    return filtered.sort((a, b) => {
+      if (sortType === 'new') {
+        return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+      }
+      return b.votes - a.votes; // Default 'top'
+    });
+  };
+
+  const handleVote = async (e: React.MouseEvent, skillId: number, type: 'up' | 'down') => {
+    e.preventDefault(); e.stopPropagation();
+    if (!user) { alert("Please sign in to vote!"); return; }
+    const currentVote = userVotes[skillId];
+    
+    if (currentVote === type) {
+      await supabase.from('user_votes').delete().eq('user_id', user.id).eq('skill_id', skillId);
+      await supabase.rpc(type === 'up' ? 'decrement_votes' : 'increment_votes', { row_id: skillId });
+    } else {
+      await supabase.from('user_votes').upsert({ user_id: user.id, skill_id: skillId, vote_type: type });
+      await supabase.rpc(type === 'up' ? 'increment_votes' : 'decrement_votes', { row_id: skillId });
+      if (currentVote !== null && currentVote !== undefined) {
+        await supabase.rpc(type === 'up' ? 'increment_votes' : 'decrement_votes', { row_id: skillId });
+      }
+    }
+    fetchData(user);
+  };
+
+  const handleShare = async (e: React.MouseEvent, skill: any) => {
+    e.preventDefault(); e.stopPropagation();
+    const url = `${window.location.origin}/drills/${skill.slug}`;
+    try {
+      if (navigator.share) await navigator.share({ title: skill.title, url });
+      else { await navigator.clipboard.writeText(url); alert("Link copied!"); }
+    } catch (err) { console.log(err); }
+  };
+
+  const handleToggleHeart = async (e: React.MouseEvent, skillId: number) => {
+    e.preventDefault(); e.stopPropagation();
+    if (!user) { alert("Please sign in!"); return; }
+    const isFav = userFavorites.includes(skillId);
+    if (isFav) await supabase.from('user_favorites').delete().eq('user_id', user.id).eq('skill_id', skillId);
+    else await supabase.from('user_favorites').insert({ user_id: user.id, skill_id: skillId });
+    fetchData(user); 
+  };
+
+  const categories = skills.reduce((acc: any, skill) => {
+    const cat = skill.category || "General";
+    if (!acc[cat]) acc[cat] = [];
+    acc[cat].push(skill);
+    return acc;
+  }, {});
+
+  const getIcon = (category: string) => {
+    switch (category?.toLowerCase()) {
+      case 'security': return <Shield size={18} />;
+      case 'grammar': return <GraduationCap size={18} />;
+      case 'ai literacy': return <Brain size={18} />;
+      default: return <Zap size={18} />;
+    }
+  };
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
+    <div className="min-h-screen font-sans relative">
+      {/* Background Layers */}
+      <div className="fixed inset-0 z-0 bg-cover bg-center bg-fixed" style={{ backgroundImage: "url('/island-bg.png')" }} />
+      <div className="fixed inset-0 z-1 bg-overlay transition-colors duration-300" />
+
+      <div className="relative z-10 text-foreground transition-colors duration-300">
+        <nav className="sticky top-0 z-50 border-b bg-background/60 backdrop-blur-xl px-6 h-16 flex items-center justify-between border-slate-200/50 dark:border-slate-800/50">
+          <Link href="/" className="flex items-center gap-2">
+              <div className="bg-indigo-600 p-2 rounded-lg text-white shadow-lg"><Brain size={22}/></div>
+              <span className="font-black uppercase tracking-tighter text-sm sm:text-base">MicroSkill Hub</span>
+          </Link>
+          <div className="flex items-center gap-4">
+              <ThemeToggle />
+              {user ? (
+                  <button onClick={() => supabase.auth.signOut()} className="text-slate-500 hover:text-rose-500 transition-colors"><LogOut size={20}/></button>
+              ) : <Link href="/login" className="text-sm font-bold opacity-70 hover:opacity-100">SIGN IN</Link>}
+              <Link href="/vault" className="bg-indigo-600 text-white px-5 py-2 rounded-full text-xs font-bold shadow-lg active:scale-95 transition-all">MY VAULT</Link>
+          </div>
+        </nav>
+
+        <header className="py-20 text-center">
+          <h1 className="text-5xl font-black mb-8 tracking-tighter max-w-4xl mx-auto px-4">Master the Small Things.</h1>
+          <div className="relative max-w-lg mx-auto px-6">
+              <Search className="absolute left-10 top-1/2 -translate-y-1/2 text-slate-400" size={18}/>
+              <input 
+                  type="text" 
+                  placeholder="Search skills..." 
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="w-full bg-card backdrop-blur-md border border-slate-200/50 dark:border-slate-800/50 py-3 pl-12 pr-4 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500 shadow-sm transition-all"
+              />
+          </div>
+        </header>
+
+        <main className="max-w-7xl mx-auto p-6 md:p-12">
+          {loading ? (
+            <div className="text-center py-20 font-black text-slate-400 text-3xl animate-pulse uppercase">Loading Paradise...</div>
+          ) : Object.keys(categories).map(category => {
+            const currentSort = categorySort[category] || 'top';
+            const allCategorySkills = categories[category].filter((s:any) => s.title.toLowerCase().includes(searchQuery.toLowerCase()));
+            const filtered = getProcessedSkills(category, allCategorySkills);
+            
+            if (allCategorySkills.length === 0) return null;
+
+            return (
+              <section key={category} className="mb-16 last:mb-0 relative group">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-6 px-1 gap-4">
+                    {/* Clickable Header for Deep Dive */}
+                    <Link 
+                        href={`/categories/${category.toLowerCase().replace(/\s+/g, '-')}`} 
+                        className="group/title inline-flex items-center gap-2"
+                    >
+                        <h2 className="text-xs font-black uppercase tracking-[0.2em] text-slate-500 group-hover/title:text-indigo-500 transition-colors">
+                            {category}
+                        </h2>
+                        <ChevronRight size={14} className="text-indigo-500 group-hover/title:translate-x-1 transition-transform"/>
+                    </Link>
+                    
+                    <div className="flex items-center gap-4">
+                        <div className="flex bg-slate-200/20 dark:bg-slate-800/40 p-1 rounded-lg backdrop-blur-sm border border-slate-200/30 dark:border-slate-700/30">
+                            {[
+                                { id: 'top', icon: <Trophy size={12}/>, label: 'Top' },
+                                { id: 'new', icon: <Clock size={12}/>, label: 'New' },
+                                { id: 'saved', icon: <Bookmark size={12}/>, label: 'Saved' }
+                            ].map((btn) => (
+                                <button
+                                    key={btn.id}
+                                    onClick={() => setCategorySort({ ...categorySort, [category]: btn.id as SortType })}
+                                    className={`flex items-center gap-1.5 px-3 py-1 rounded-md text-[10px] font-bold transition-all ${
+                                        currentSort === btn.id 
+                                        ? 'bg-white dark:bg-slate-700 text-indigo-600 dark:text-indigo-400 shadow-sm' 
+                                        : 'text-slate-400 hover:text-slate-600 dark:hover:text-slate-200'
+                                    }`}
+                                >
+                                    {btn.icon} {btn.label}
+                                </button>
+                            ))}
+                        </div>
+
+                        <div className="flex gap-2">
+                            <button onClick={() => scroll(category, 'left')} className="p-1.5 rounded-full bg-background/40 hover:bg-background/80 transition-all border border-slate-200/50 dark:border-slate-800/50"><ChevronLeft size={16}/></button>
+                            <button onClick={() => scroll(category, 'right')} className="p-1.5 rounded-full bg-background/40 hover:bg-background/80 transition-all border border-slate-200/50 dark:border-slate-800/50"><ChevronRight size={16}/></button>
+                        </div>
+                    </div>
+                </div>
+
+                <div 
+                  ref={el => { scrollRefs.current[category] = el; }}
+                  className="flex gap-4 overflow-x-auto pb-6 scrollbar-hide scroll-smooth-custom px-1 snap-x min-h-[150px]"
+                >
+                  {filtered.length > 0 ? filtered.map((skill: any) => {
+                    const voteType = userVotes[skill.id];
+                    const isFav = userFavorites.includes(skill.id);
+                    return (
+                      <Link 
+                        key={skill.id} 
+                        href={`/drills/${skill.slug}`} 
+                        className="min-w-[240px] max-w-[240px] snap-start bg-card backdrop-blur-lg border border-slate-200/50 dark:border-slate-800/50 rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all"
+                      >
+                        <div className={`h-1 w-full ${voteType === 'up' ? 'bg-emerald-500' : voteType === 'down' ? 'bg-rose-500' : 'bg-indigo-600/30'}`}></div>
+                        <div className="p-5 flex flex-col h-full">
+                          <div className="flex justify-between items-start mb-4">
+                            <div className="h-9 w-9 bg-indigo-50 dark:bg-slate-800/50 rounded-lg flex items-center justify-center text-indigo-600">
+                                {getIcon(skill.category)}
+                            </div>
+                            <button onClick={(e) => handleShare(e, skill)} className="p-1.5 text-slate-400 hover:text-indigo-500 transition-colors"><Share2 size={16} /></button>
+                          </div>
+                          <h3 className="text-base font-bold mb-6 leading-tight h-[40px] line-clamp-2">{skill.title}</h3>
+                          <div className="mt-auto pt-4 border-t border-slate-200/30 flex items-center justify-between">
+                            <div className="flex items-center gap-1 bg-slate-100/50 dark:bg-slate-800/50 p-1 rounded-full">
+                              <button onClick={(e) => handleVote(e, skill.id, 'up')} className={`p-1 rounded-full transition-all ${voteType === 'up' ? 'bg-emerald-500 text-white shadow-sm' : 'text-slate-400 hover:text-emerald-500'}`}><ArrowUp size={14} strokeWidth={3}/></button>
+                              <span className={`px-1 text-[10px] font-black ${voteType === 'up' ? 'text-emerald-600' : voteType === 'down' ? 'text-rose-600' : 'text-slate-500'}`}>{skill.votes}</span>
+                              <button onClick={(e) => handleVote(e, skill.id, 'down')} className={`p-1 rounded-full transition-all ${voteType === 'down' ? 'bg-rose-500 text-white shadow-sm' : 'text-slate-400 hover:text-rose-500'}`}><ArrowDown size={14} strokeWidth={3}/></button>
+                            </div>
+                            <button onClick={(e) => handleToggleHeart(e, skill.id)} className={`p-1.5 rounded-full transition-all ${isFav ? 'text-rose-500 scale-110' : 'text-slate-300 hover:text-rose-400'}`}><Heart size={18} fill={isFav ? "currentColor" : "none"} /></button>
+                          </div>
+                        </div>
+                      </Link>
+                    );
+                  }) : (
+                    <div className="w-full flex flex-col items-center justify-center py-10 opacity-40">
+                        <Bookmark size={32} className="mb-2"/>
+                        <p className="text-xs font-bold uppercase tracking-widest">No Saved Skills Here</p>
+                    </div>
+                  )}
+                </div>
+              </section>
+            );
+          })}
+        </main>
+      </div>
     </div>
   );
 }
