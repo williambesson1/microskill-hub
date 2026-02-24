@@ -210,17 +210,41 @@ export default function Dashboard() {
           </section>
 
           {/* Danger Zone */}
-          <section className="pt-12 border-t border-slate-200/30">
-            <h3 className="text-1xl font-black uppercase tracking-widest text-rose-500/60 mb-8 font-mono">Danger Zone</h3>
+          <section className="pt-12 border-t border-slate-200/50 dark:border-slate-800/50 mt-12">
+            <h3 className="text-sm font-black uppercase tracking-widest text-rose-500 dark:text-rose-400 mb-8 font-mono">Danger Zone</h3>
+            
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="bg-rose-500/5 backdrop-blur-sm rounded-3xl p-6 border border-rose-500/20 flex flex-col justify-between items-start gap-4">
-                <div><h4 className="font-bold text-rose-600 flex items-center gap-2"><Trash2 size={16}/> Wipe My Activity</h4><p className="text-xs text-slate-500 mt-1">Clears upvotes/favorites without deleting account.</p></div>
-                <button onClick={handleWipeData} className="w-full py-3 rounded-2xl bg-white/50 hover:bg-rose-100 text-rose-600 font-bold text-xs uppercase tracking-tighter transition-all">Clear All Data</button>
+              
+              {/* Wipe Data Card */}
+              <div className="bg-rose-50 dark:bg-rose-500/10 backdrop-blur-sm rounded-3xl p-6 border border-rose-200 dark:border-rose-500/20 flex flex-col justify-between items-start gap-4 transition-colors">
+                <div>
+                  <h4 className="font-bold text-rose-700 dark:text-rose-400 flex items-center gap-2">
+                    <Trash2 size={18}/> Wipe My Activity
+                  </h4>
+                  <p className="text-sm text-slate-600 dark:text-slate-400 mt-2 leading-relaxed">
+                    Clears your upvotes and favorites without deleting your account.
+                  </p>
+                </div>
+                <button onClick={handleWipeData} className="w-full py-3 rounded-2xl bg-white dark:bg-rose-500/20 hover:bg-rose-100 dark:hover:bg-rose-500/30 text-rose-600 dark:text-rose-300 font-bold text-xs uppercase tracking-widest transition-all border border-rose-200 dark:border-rose-500/30">
+                  Clear All Data
+                </button>
               </div>
-              <div className="bg-slate-900/5 backdrop-blur-sm rounded-3xl p-6 border border-slate-900/10 flex flex-col justify-between items-start gap-4">
-                <div><h4 className="font-bold text-slate-800">Delete Account Permanently</h4><p className="text-xs text-slate-500 mt-1">Permanently remove email and all progress.</p></div>
-                <button onClick={handleDeleteAccount} className="w-full py-3 rounded-2xl bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs uppercase tracking-tighter transition-all shadow-lg shadow-rose-500/20">Delete Forever</button>
+              
+              {/* Delete Account Card */}
+              <div className="bg-slate-50 dark:bg-slate-900/60 backdrop-blur-sm rounded-3xl p-6 border border-slate-200 dark:border-slate-800 flex flex-col justify-between items-start gap-4 transition-colors">
+                <div>
+                  <h4 className="font-bold text-slate-800 dark:text-slate-200 flex items-center gap-2">
+                    Delete Account Permanently
+                  </h4>
+                  <p className="text-sm text-slate-600 dark:text-slate-400 mt-2 leading-relaxed">
+                    Permanently remove your email and all progress from the Hub.
+                  </p>
+                </div>
+                <button onClick={handleDeleteAccount} className="w-full py-3 rounded-2xl bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs uppercase tracking-widest transition-all shadow-lg shadow-rose-500/20">
+                  Delete Forever
+                </button>
               </div>
+
             </div>
           </section>
         </main>

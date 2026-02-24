@@ -3,22 +3,9 @@
 import React, { useEffect, useState, useRef } from 'react';
 import Link from 'next/link';
 import { 
-  ArrowUp, 
-  ArrowDown, 
-  Share2, 
-  Heart, 
-  Brain, 
-  Shield, 
-  GraduationCap, 
-  Zap, 
-  Search, 
-  LogOut, 
-  ChevronRight, 
-  ChevronLeft,
-  Trophy,
-  Clock,
-  Bookmark,
-  Lightbulb
+  ArrowUp, ArrowDown, Share2, Heart, Brain, Shield, 
+  GraduationCap, Zap, Search, LogOut, ChevronRight, 
+  ChevronLeft, Trophy, Clock, Bookmark, Lightbulb
 } from 'lucide-react';
 import { supabase } from '../lib/supabase'; 
 import ThemeToggle from '../components/ThemeToggle'; 
@@ -33,7 +20,6 @@ export default function Home() {
   const [user, setUser] = useState<any>(null);
   const [searchQuery, setSearchQuery] = useState("");
   
-  // Track sort state and processing state to prevent spam clicks
   const [isProcessing, setIsProcessing] = useState<{[key: number]: boolean}>({});
   const [categorySort, setCategorySort] = useState<{[key: string]: SortType}>({});
   const scrollRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
@@ -44,7 +30,6 @@ export default function Home() {
 
     if (currentUser) {
       const { data: votesData } = await supabase.from('user_votes').select('skill_id, vote_type').eq('user_id', currentUser.id);
-      // Convert database numbers (1, -1) back to UI strings ('up', 'down')
       const voteMap = (votesData || []).reduce((acc, v) => ({ ...acc, [v.skill_id]: v.vote_type === 1 ? 'up' : 'down' }), {});
       setUserVotes(voteMap);
 
@@ -99,25 +84,20 @@ export default function Home() {
     e.preventDefault(); e.stopPropagation();
     if (!user) { alert("Please sign in to vote!"); return; }
     
-    // Block double-clicks while processing
     if (isProcessing[skillId]) return;
     setIsProcessing(prev => ({ ...prev, [skillId]: true }));
 
     const currentVote = userVotes[skillId];
-    // Convert 'up'/'down' to 1/-1 for the database
     const voteValue = type === 'up' ? 1 : -1;
 
     try {
       if (currentVote === type) {
-        // TOGGLE OFF
-        setUserVotes(prev => ({ ...prev, [skillId]: null })); // Instant UI update
+        setUserVotes(prev => ({ ...prev, [skillId]: null })); 
         await supabase.from('user_votes').delete().eq('user_id', user.id).eq('skill_id', skillId);
         await supabase.rpc(type === 'up' ? 'decrement_votes' : 'increment_votes', { row_id: skillId });
       } else {
-        // NEW VOTE OR SWITCH
-        setUserVotes(prev => ({ ...prev, [skillId]: type })); // Instant UI update
+        setUserVotes(prev => ({ ...prev, [skillId]: type })); 
         
-        // THE FIX: We tell Supabase to look at the exact columns that make up our unique rule
         const { error } = await supabase.from('user_votes').upsert({ 
           user_id: user.id, 
           skill_id: skillId, 
@@ -126,20 +106,16 @@ export default function Home() {
 
         if (error) throw error;
 
-        // Math for total count on the card
         if (!currentVote) {
           await supabase.rpc(type === 'up' ? 'increment_votes' : 'decrement_votes', { row_id: skillId });
         } else {
-          // If switching from Up to Down, adjust by 2 points
           await supabase.rpc(type === 'up' ? 'increment_votes' : 'decrement_votes', { row_id: skillId });
           await supabase.rpc(type === 'up' ? 'increment_votes' : 'decrement_votes', { row_id: skillId });
         }
       }
-      // Silently sync with server to ensure accuracy
       fetchData(user);
     } catch (err: any) {
       console.error("Voting error:", err.message || err);
-      // Revert the UI if the database failed
       setUserVotes(prev => ({ ...prev, [skillId]: currentVote }));
     } finally {
       setIsProcessing(prev => ({ ...prev, [skillId]: false }));
@@ -165,7 +141,7 @@ export default function Home() {
       fetchData(user); 
     } catch (err) {
       console.error(err);
-      fetchData(user); // Revert on error
+      fetchData(user); 
     } finally {
       setIsProcessing(prev => ({ ...prev, [skillId]: false }));
     }
@@ -189,10 +165,10 @@ export default function Home() {
 
   const getCategoryColor = (category: string) => {
     switch (category?.toLowerCase()) {
-      case 'security': return 'bg-rose-500';      // Red for security
-      case 'grammar': return 'bg-blue-500';       // Blue for grammar
-      case 'ai literacy': return 'bg-violet-500'; // Purple for AI
-      default: return 'bg-amber-500';             // Yellow for general/others
+      case 'security': return 'bg-rose-500'; 
+      case 'grammar': return 'bg-blue-500'; 
+      case 'ai literacy': return 'bg-violet-500';
+      default: return 'bg-amber-500';
     }
   };
 
@@ -207,12 +183,11 @@ export default function Home() {
 
   return (
     <div className="min-h-screen font-sans relative">
+      
       <div className="fixed inset-0 z-0 bg-cover bg-center bg-fixed" style={{ backgroundImage: "url('/island-bg.png')" }} />
       <div className="fixed inset-0 z-1 bg-overlay transition-colors duration-300" />
 
       <div className="relative z-10 text-foreground transition-colors duration-300">
-        
-        {/* REBALANCED MOBILE NAV */}
         <nav className="sticky top-0 z-50 border-b bg-background/60 backdrop-blur-xl px-4 sm:px-6 h-16 flex items-center justify-between border-slate-200/50 dark:border-slate-800/50">
           <Link href="/" className="flex items-center gap-2">
               <div className="bg-indigo-600 p-1.5 sm:p-2 rounded-lg text-white shadow-lg"><Brain size={20} className="sm:w-[22px] sm:h-[22px]"/></div>
@@ -230,7 +205,6 @@ export default function Home() {
           </div>
         </nav>
 
-        {/* TIGHTER MOBILE HEADER */}
         <header className="pt-8 pb-10 sm:py-20 text-center">
           <h1 className="text-4xl sm:text-5xl font-black mb-6 tracking-tighter max-w-4xl mx-auto px-4 leading-tight">Learn what actually matters. Fast.</h1>
           <div className="relative max-w-lg mx-auto px-4 sm:px-6">
@@ -245,7 +219,6 @@ export default function Home() {
           </div>
         </header>
 
-        {/* REDUCED MOBILE PADDING */}
         <main className="max-w-7xl mx-auto p-4 sm:p-6 md:p-12">
           {loading ? (
             <div className="text-center py-20 font-black text-slate-400 text-3xl animate-pulse uppercase">Loading Paradise...</div>
@@ -259,7 +232,6 @@ export default function Home() {
             return (
               <section key={category} className="mb-12 sm:mb-16 last:mb-0 relative group">
                 
-                {/* UPGRADED CATEGORY HEADER & TOGGLES */}
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-4 sm:mb-6 px-1 gap-3 sm:gap-4">
                     <Link 
                         href={`/categories/${category.toLowerCase().replace(/\s+/g, '-')}`} 
@@ -272,8 +244,6 @@ export default function Home() {
                     </Link>
                     
                     <div className="flex items-center gap-3 sm:gap-4 w-full sm:w-auto">
-                        
-                        {/* High-Contrast Segmented Control */}
                         <div className="flex w-full sm:w-auto bg-white/80 dark:bg-slate-900/80 p-1 rounded-xl backdrop-blur-md border border-slate-200 dark:border-slate-700 shadow-sm overflow-x-auto scrollbar-hide">
                             {[
                                 { id: 'top', icon: <Trophy size={12}/>, label: 'Top' },
@@ -293,8 +263,6 @@ export default function Home() {
                                 </button>
                             ))}
                         </div>
-
-                        {/* Arrows hidden on Mobile (users swipe naturally), visible on Desktop */}
                         <div className="hidden sm:flex gap-2">
                             <button onClick={() => scroll(category, 'left')} className="p-1.5 rounded-full bg-background/40 hover:bg-background/80 transition-all border border-slate-200/50 dark:border-slate-800/50"><ChevronLeft size={16}/></button>
                             <button onClick={() => scroll(category, 'right')} className="p-1.5 rounded-full bg-background/40 hover:bg-background/80 transition-all border border-slate-200/50 dark:border-slate-800/50"><ChevronRight size={16}/></button>
