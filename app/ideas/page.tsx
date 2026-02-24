@@ -2,8 +2,8 @@
 
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
-// ADDED: Trash2 for the delete button
-import { ArrowLeft, ArrowUp, ArrowDown, Lightbulb, Plus, MessageSquare, Trash2 } from 'lucide-react';
+// We added Brain and LogOut to match the homepage navigation
+import { ArrowLeft, ArrowUp, ArrowDown, Lightbulb, Plus, MessageSquare, Trash2, Brain, LogOut } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 import ThemeToggle from '../../components/ThemeToggle';
 
@@ -143,10 +143,22 @@ export default function IdeasBoard() {
       <div className="fixed inset-0 z-1 bg-overlay transition-colors duration-300" />
 
       <div className="relative z-10 text-foreground pb-20">
+        
+        {/* === NEW GLOBAL NAVIGATION BAR === */}
         <nav className="sticky top-0 z-50 border-b bg-background/60 backdrop-blur-xl px-6 h-16 flex items-center justify-between border-slate-200/50 dark:border-slate-800/50">
-          <Link href="/" className="flex items-center gap-2 font-bold text-indigo-600"><ArrowLeft size={20} /> <span className="text-xs font-black uppercase tracking-widest">Back</span></Link>
-          <div className="flex items-center gap-4"><ThemeToggle /></div>
+          <Link href="/" className="flex items-center gap-2">
+              <div className="bg-indigo-600 p-2 rounded-lg text-white shadow-lg"><Brain size={22}/></div>
+              <span className="font-black uppercase tracking-tighter text-sm sm:text-base">Skealed</span>
+          </Link>
+          <div className="flex items-center gap-4">
+              <ThemeToggle />
+              {user ? (
+                  <button onClick={() => supabase.auth.signOut()} className="text-slate-500 hover:text-rose-500 transition-colors"><LogOut size={20}/></button>
+              ) : <Link href="/login" className="text-sm font-bold opacity-70 hover:opacity-100">SIGN IN</Link>}
+              <Link href="/vault" className="bg-indigo-600 text-white px-5 py-2 rounded-full text-xs font-bold shadow-lg active:scale-95 transition-all">Dashboard</Link>
+          </div>
         </nav>
+        {/* ================================= */}
 
         <main className="max-w-4xl mx-auto px-6 py-12">
           <header className="mb-12 text-center">

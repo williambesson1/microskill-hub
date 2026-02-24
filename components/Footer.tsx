@@ -12,10 +12,10 @@ export default function Footer() {
           {/* Brand Section */}
           <div className="col-span-1 md:col-span-1">
             <h2 className="text-xl font-black tracking-tighter uppercase mb-4 text-indigo-600">
-              Paradise Hub
-            </h2>
+              Skealed
+                          </h2>
             <p className="text-sm text-slate-500 leading-relaxed mb-6">
-              Mastering microskills in an island state of mind. Your personal command center for growth.
+            A community-driven platform for bite-sized learning. We turn complex digital survival skills into 30-second interactive drills.
             </p>
             <div className="flex gap-4">
               <Link href="#" className="text-slate-400 hover:text-indigo-500 transition-colors"><Twitter size={20} /></Link>

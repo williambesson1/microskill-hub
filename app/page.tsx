@@ -187,6 +187,15 @@ export default function Home() {
     return acc;
   }, {});
 
+  const getCategoryColor = (category: string) => {
+    switch (category?.toLowerCase()) {
+      case 'security': return 'bg-rose-500';      // Red for security
+      case 'grammar': return 'bg-blue-500';       // Blue for grammar
+      case 'ai literacy': return 'bg-violet-500'; // Purple for AI
+      default: return 'bg-amber-500';             // Yellow for general/others
+    }
+  };
+
   const getIcon = (category: string) => {
     switch (category?.toLowerCase()) {
       case 'security': return <Shield size={18} />;
@@ -202,28 +211,30 @@ export default function Home() {
       <div className="fixed inset-0 z-1 bg-overlay transition-colors duration-300" />
 
       <div className="relative z-10 text-foreground transition-colors duration-300">
-        <nav className="sticky top-0 z-50 border-b bg-background/60 backdrop-blur-xl px-6 h-16 flex items-center justify-between border-slate-200/50 dark:border-slate-800/50">
+        
+        {/* REBALANCED MOBILE NAV */}
+        <nav className="sticky top-0 z-50 border-b bg-background/60 backdrop-blur-xl px-4 sm:px-6 h-16 flex items-center justify-between border-slate-200/50 dark:border-slate-800/50">
           <Link href="/" className="flex items-center gap-2">
-              <div className="bg-indigo-600 p-2 rounded-lg text-white shadow-lg"><Brain size={22}/></div>
+              <div className="bg-indigo-600 p-1.5 sm:p-2 rounded-lg text-white shadow-lg"><Brain size={20} className="sm:w-[22px] sm:h-[22px]"/></div>
               <span className="font-black uppercase tracking-tighter text-sm sm:text-base">Skealed</span>
           </Link>
-          <div className="flex items-center gap-4">
-            {/* NEW LINK HERE */}
+          <div className="flex items-center gap-2 sm:gap-4">
               <Link href="/ideas" className="hidden sm:flex items-center gap-1.5 text-xs font-bold text-slate-500 hover:text-amber-500 transition-colors uppercase tracking-widest">
              <Lightbulb size={14} /> Suggest Skill
              </Link>
               <ThemeToggle />
               {user ? (
-                  <button onClick={() => supabase.auth.signOut()} className="text-slate-500 hover:text-rose-500 transition-colors"><LogOut size={20}/></button>
-              ) : <Link href="/login" className="text-sm font-bold opacity-70 hover:opacity-100">SIGN IN</Link>}
-              <Link href="/vault" className="bg-indigo-600 text-white px-5 py-2 rounded-full text-xs font-bold shadow-lg active:scale-95 transition-all">Dashboard</Link>
+                  <button onClick={() => supabase.auth.signOut()} className="text-slate-500 hover:text-rose-500 transition-colors p-1"><LogOut size={18} className="sm:w-[20px] sm:h-[20px]"/></button>
+              ) : <Link href="/login" className="text-xs sm:text-sm font-bold opacity-70 hover:opacity-100 whitespace-nowrap">SIGN IN</Link>}
+              <Link href="/vault" className="bg-indigo-600 text-white px-3 py-1.5 sm:px-5 sm:py-2 rounded-full text-[10px] sm:text-xs font-bold shadow-lg active:scale-95 transition-all whitespace-nowrap">Dashboard</Link>
           </div>
         </nav>
 
-        <header className="py-20 text-center">
-          <h1 className="text-5xl font-black mb-8 tracking-tighter max-w-4xl mx-auto px-4">Practice skills useful to you</h1>
-          <div className="relative max-w-lg mx-auto px-6">
-              <Search className="absolute left-10 top-1/2 -translate-y-1/2 text-slate-400" size={18}/>
+        {/* TIGHTER MOBILE HEADER */}
+        <header className="pt-8 pb-10 sm:py-20 text-center">
+          <h1 className="text-4xl sm:text-5xl font-black mb-6 tracking-tighter max-w-4xl mx-auto px-4 leading-tight">Learn what actually matters. Fast.</h1>
+          <div className="relative max-w-lg mx-auto px-4 sm:px-6">
+              <Search className="absolute left-8 sm:left-10 top-1/2 -translate-y-1/2 text-slate-400" size={18}/>
               <input 
                   type="text" 
                   placeholder="Search skills..." 
@@ -234,7 +245,8 @@ export default function Home() {
           </div>
         </header>
 
-        <main className="max-w-7xl mx-auto p-6 md:p-12">
+        {/* REDUCED MOBILE PADDING */}
+        <main className="max-w-7xl mx-auto p-4 sm:p-6 md:p-12">
           {loading ? (
             <div className="text-center py-20 font-black text-slate-400 text-3xl animate-pulse uppercase">Loading Paradise...</div>
           ) : Object.keys(categories).map(category => {
@@ -245,8 +257,10 @@ export default function Home() {
             if (allCategorySkills.length === 0) return null;
 
             return (
-              <section key={category} className="mb-16 last:mb-0 relative group">
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-6 px-1 gap-4">
+              <section key={category} className="mb-12 sm:mb-16 last:mb-0 relative group">
+                
+                {/* UPGRADED CATEGORY HEADER & TOGGLES */}
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-4 sm:mb-6 px-1 gap-3 sm:gap-4">
                     <Link 
                         href={`/categories/${category.toLowerCase().replace(/\s+/g, '-')}`} 
                         className="group/title inline-flex items-center gap-2"
@@ -257,8 +271,10 @@ export default function Home() {
                         <ChevronRight size={14} className="text-indigo-500 group-hover/title:translate-x-1 transition-transform"/>
                     </Link>
                     
-                    <div className="flex items-center gap-4">
-                        <div className="flex bg-slate-200/20 dark:bg-slate-800/40 p-1 rounded-lg backdrop-blur-sm border border-slate-200/30 dark:border-slate-700/30">
+                    <div className="flex items-center gap-3 sm:gap-4 w-full sm:w-auto">
+                        
+                        {/* High-Contrast Segmented Control */}
+                        <div className="flex w-full sm:w-auto bg-white/80 dark:bg-slate-900/80 p-1 rounded-xl backdrop-blur-md border border-slate-200 dark:border-slate-700 shadow-sm overflow-x-auto scrollbar-hide">
                             {[
                                 { id: 'top', icon: <Trophy size={12}/>, label: 'Top' },
                                 { id: 'new', icon: <Clock size={12}/>, label: 'New' },
@@ -267,10 +283,10 @@ export default function Home() {
                                 <button
                                     key={btn.id}
                                     onClick={() => setCategorySort({ ...categorySort, [category]: btn.id as SortType })}
-                                    className={`flex items-center gap-1.5 px-3 py-1 rounded-md text-[10px] font-bold transition-all ${
+                                    className={`flex flex-1 sm:flex-none items-center justify-center gap-1.5 px-3 py-1.5 rounded-lg text-[10px] font-bold transition-all whitespace-nowrap ${
                                         currentSort === btn.id 
-                                        ? 'bg-white dark:bg-slate-700 text-indigo-600 dark:text-indigo-400 shadow-sm' 
-                                        : 'text-slate-400 hover:text-slate-600 dark:hover:text-slate-200'
+                                        ? 'bg-indigo-600 text-white shadow-md' 
+                                        : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 hover:bg-black/5 dark:hover:bg-white/5'
                                     }`}
                                 >
                                     {btn.icon} {btn.label}
@@ -278,7 +294,8 @@ export default function Home() {
                             ))}
                         </div>
 
-                        <div className="flex gap-2">
+                        {/* Arrows hidden on Mobile (users swipe naturally), visible on Desktop */}
+                        <div className="hidden sm:flex gap-2">
                             <button onClick={() => scroll(category, 'left')} className="p-1.5 rounded-full bg-background/40 hover:bg-background/80 transition-all border border-slate-200/50 dark:border-slate-800/50"><ChevronLeft size={16}/></button>
                             <button onClick={() => scroll(category, 'right')} className="p-1.5 rounded-full bg-background/40 hover:bg-background/80 transition-all border border-slate-200/50 dark:border-slate-800/50"><ChevronRight size={16}/></button>
                         </div>
@@ -297,25 +314,50 @@ export default function Home() {
                       <Link 
                         key={skill.id} 
                         href={`/drills/${skill.slug}`} 
-                        className="min-w-[240px] max-w-[240px] snap-start bg-card backdrop-blur-lg border border-slate-200/50 dark:border-slate-800/50 rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all"
+                        className="min-w-[240px] max-w-[240px] snap-start bg-card backdrop-blur-lg border border-slate-200/50 dark:border-slate-800/50 rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all flex flex-col"
                       >
-                        <div className={`h-1 w-full ${voteType === 'up' ? 'bg-emerald-500' : voteType === 'down' ? 'bg-rose-500' : 'bg-indigo-600/30'}`}></div>
-                        <div className="p-5 flex flex-col h-full">
+                        <div className={`h-1 w-full shrink-0 ${voteType === 'up' ? 'bg-emerald-500' : voteType === 'down' ? 'bg-rose-500' : 'bg-indigo-600/30'}`}></div>
+                        <div className="p-5 flex flex-col flex-grow">
                           <div className="flex justify-between items-start mb-4">
                             <div className="h-9 w-9 bg-indigo-50 dark:bg-slate-800/50 rounded-lg flex items-center justify-center text-indigo-600">
                                 {getIcon(skill.category)}
                             </div>
                             <button onClick={(e) => handleShare(e, skill)} className="p-1.5 text-slate-400 hover:text-indigo-500 transition-colors"><Share2 size={16} /></button>
                           </div>
-                          <h3 className="text-base font-bold mb-6 leading-tight h-[40px] line-clamp-2">{skill.title}</h3>
+                          <h3 className="text-base font-bold mb-6 leading-tight h-[60px] line-clamp-3">{skill.title}</h3>
+                          
                           <div className="mt-auto pt-4 border-t border-slate-200/30 flex items-center justify-between">
-                            <div className="flex items-center gap-1 bg-slate-100/50 dark:bg-slate-800/50 p-1 rounded-full">
-                              <button disabled={isCardLoading} onClick={(e) => handleVote(e, skill.id, 'up')} className={`p-1 rounded-full transition-all ${voteType === 'up' ? 'bg-emerald-500 text-white shadow-sm' : 'text-slate-400 hover:text-emerald-500'}`}><ArrowUp size={14} strokeWidth={3}/></button>
-                              <span className={`px-1 text-[10px] font-black ${voteType === 'up' ? 'text-emerald-600' : voteType === 'down' ? 'text-rose-600' : 'text-slate-500'}`}>{skill.votes}</span>
-                              <button disabled={isCardLoading} onClick={(e) => handleVote(e, skill.id, 'down')} className={`p-1 rounded-full transition-all ${voteType === 'down' ? 'bg-rose-500 text-white shadow-sm' : 'text-slate-400 hover:text-rose-500'}`}><ArrowDown size={14} strokeWidth={3}/></button>
+                            <div className="flex items-center gap-1 bg-slate-100 dark:bg-slate-800 p-1 rounded-full border border-slate-200 dark:border-slate-700 shadow-inner">
+                              <button 
+                                disabled={isCardLoading} 
+                                onClick={(e) => handleVote(e, skill.id, 'up')} 
+                                className={`p-1 rounded-full transition-all ${voteType === 'up' ? 'bg-emerald-500 text-white shadow-sm' : 'text-slate-500 dark:text-slate-400 hover:text-emerald-500 dark:hover:text-emerald-400'}`}
+                              >
+                                <ArrowUp size={14} strokeWidth={3}/>
+                              </button>
+                              
+                              <span className={`px-1 text-xs font-black ${voteType === 'up' ? 'text-emerald-600 dark:text-emerald-400' : voteType === 'down' ? 'text-rose-600 dark:text-rose-400' : 'text-slate-700 dark:text-slate-300'}`}>
+                                {skill.votes}
+                              </span>
+                              
+                              <button 
+                                disabled={isCardLoading} 
+                                onClick={(e) => handleVote(e, skill.id, 'down')} 
+                                className={`p-1 rounded-full transition-all ${voteType === 'down' ? 'bg-rose-500 text-white shadow-sm' : 'text-slate-500 dark:text-slate-400 hover:text-rose-500 dark:hover:text-rose-400'}`}
+                              >
+                                <ArrowDown size={14} strokeWidth={3}/>
+                              </button>
                             </div>
-                            <button disabled={isCardLoading} onClick={(e) => handleToggleHeart(e, skill.id)} className={`p-1.5 rounded-full transition-all ${isFav ? 'text-rose-500 scale-110' : 'text-slate-300 hover:text-rose-400'}`}><Heart size={18} fill={isFav ? "currentColor" : "none"} /></button>
+
+                            <button 
+                              disabled={isCardLoading} 
+                              onClick={(e) => handleToggleHeart(e, skill.id)} 
+                              className={`p-1.5 rounded-full transition-all ${isFav ? 'text-rose-500 scale-110' : 'text-slate-400 dark:text-slate-500 hover:text-rose-500'}`}
+                            >
+                              <Heart size={18} fill={isFav ? "currentColor" : "none"} />
+                            </button>
                           </div>
+
                         </div>
                       </Link>
                     );
