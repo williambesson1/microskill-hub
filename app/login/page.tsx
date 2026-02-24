@@ -13,7 +13,6 @@ export default function LoginPage() {
   const [isSuccess, setIsSuccess] = useState(false);
   const [user, setUser] = useState<any>(null);
 
-  // Check if user is already logged in for the Navigation Bar
   useEffect(() => {
     const init = async () => {
       const { data: { user: activeUser } } = await supabase.auth.getUser();
@@ -33,7 +32,6 @@ export default function LoginPage() {
     setLoading(true);
     setMessage("");
 
-    // Dynamically captures the domain (Localhost or Vercel) and redirects to the Dashboard
     const redirectUrl = `${window.location.origin}/vault`;
 
     const { error } = await supabase.auth.signInWithOtp({
@@ -55,32 +53,29 @@ export default function LoginPage() {
 
   return (
     <div className="min-h-screen font-sans relative flex flex-col">
-      {/* Consistent Island Theme Background */}
       <div className="fixed inset-0 z-0 bg-cover bg-center bg-fixed" style={{ backgroundImage: "url('/island-bg.png')" }} />
       <div className="fixed inset-0 z-1 bg-overlay transition-colors duration-300" />
 
       <div className="relative z-10 text-foreground flex flex-col min-h-screen">
         
-        {/* === NEW GLOBAL NAVIGATION BAR === */}
-        <nav className="sticky top-0 z-50 border-b bg-background/60 backdrop-blur-xl px-6 h-16 flex items-center justify-between border-slate-200/50 dark:border-slate-800/50">
+        {/* REBALANCED MOBILE NAV */}
+        <nav className="sticky top-0 z-50 border-b bg-background/60 backdrop-blur-xl px-4 sm:px-6 h-16 flex items-center justify-between border-slate-200/50 dark:border-slate-800/50">
           <Link href="/" className="flex items-center gap-2">
-              <div className="bg-indigo-600 p-2 rounded-lg text-white shadow-lg"><Brain size={22}/></div>
+              <div className="bg-indigo-600 p-1.5 sm:p-2 rounded-lg text-white shadow-lg"><Brain size={20} className="sm:w-[22px] sm:h-[22px]"/></div>
               <span className="font-black uppercase tracking-tighter text-sm sm:text-base">Skealed</span>
           </Link>
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2 sm:gap-4">
               <Link href="/ideas" className="hidden sm:flex items-center gap-1.5 text-xs font-bold text-slate-500 hover:text-amber-500 transition-colors uppercase tracking-widest">
              <Lightbulb size={14} /> Suggest Skill
              </Link>
               <ThemeToggle />
               {user ? (
-                  <button onClick={() => supabase.auth.signOut()} className="text-slate-500 hover:text-rose-500 transition-colors"><LogOut size={20}/></button>
-              ) : <Link href="/login" className="text-sm font-bold opacity-70 hover:opacity-100">SIGN IN</Link>}
-              <Link href="/vault" className="bg-indigo-600 text-white px-5 py-2 rounded-full text-xs font-bold shadow-lg active:scale-95 transition-all">Dashboard</Link>
+                  <button onClick={() => supabase.auth.signOut()} className="text-slate-500 hover:text-rose-500 transition-colors p-1"><LogOut size={18} className="sm:w-[20px] sm:h-[20px]"/></button>
+              ) : <Link href="/login" className="text-xs sm:text-sm font-bold opacity-70 hover:opacity-100 whitespace-nowrap">SIGN IN</Link>}
+              <Link href="/vault" className="bg-indigo-600 text-white px-3 py-1.5 sm:px-5 sm:py-2 rounded-full text-[10px] sm:text-xs font-bold shadow-lg active:scale-95 transition-all whitespace-nowrap">Dashboard</Link>
           </div>
         </nav>
-        {/* ================================= */}
 
-        {/* Login Card */}
         <main className="flex-1 flex items-center justify-center p-6">
             <div className="w-full max-w-md bg-card backdrop-blur-xl border border-slate-200/50 dark:border-slate-800/50 rounded-[3rem] shadow-2xl p-10 text-center">
               <div className="mb-8 flex justify-center">

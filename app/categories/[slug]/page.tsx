@@ -36,10 +36,8 @@ export default function CategoryPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [sortType, setSortType] = useState<SortType>('top');
   
-  // Track processing state to prevent spam clicks
   const [isProcessing, setIsProcessing] = useState<{[key: number]: boolean}>({});
 
-  // FIX: Ensuring categoryTitle is always a string to remove the red line
   const categoryTitle = (slug?.toString() || "")
     .replace(/-/g, ' ')
     .replace(/\b\w/g, l => l.toUpperCase());
@@ -49,14 +47,13 @@ export default function CategoryPage() {
     const { data: skillsData } = await supabase
       .from('skills')
       .select('*')
-      .ilike('category', categoryTitle) // Filter strictly by this category
+      .ilike('category', categoryTitle) 
       .order('votes', { ascending: false });
     
     setSkills(skillsData || []);
 
     if (currentUser) {
       const { data: votesData } = await supabase.from('user_votes').select('skill_id, vote_type').eq('user_id', currentUser.id);
-      // Convert database numbers (1, -1) back to UI strings ('up', 'down')
       const voteMap = (votesData || []).reduce((acc, v) => ({ ...acc, [v.skill_id]: v.vote_type === 1 ? 'up' : 'down' }), {});
       setUserVotes(voteMap);
 
@@ -95,22 +92,18 @@ export default function CategoryPage() {
     e.preventDefault(); e.stopPropagation();
     if (!user) { alert("Please sign in to vote!"); return; }
     
-    // Block double-clicks while processing
     if (isProcessing[skillId]) return;
     setIsProcessing(prev => ({ ...prev, [skillId]: true }));
 
     const currentVote = userVotes[skillId];
-    // Convert 'up'/'down' to 1/-1 for the database
     const voteValue = type === 'up' ? 1 : -1;
 
     try {
       if (currentVote === type) {
-        // TOGGLE OFF
         setUserVotes(prev => ({ ...prev, [skillId]: null })); 
         await supabase.from('user_votes').delete().eq('user_id', user.id).eq('skill_id', skillId);
         await supabase.rpc(type === 'up' ? 'decrement_votes' : 'increment_votes', { row_id: skillId });
       } else {
-        // NEW VOTE OR SWITCH
         setUserVotes(prev => ({ ...prev, [skillId]: type })); 
         
         const { error } = await supabase.from('user_votes').upsert({ 
@@ -180,44 +173,42 @@ export default function CategoryPage() {
 
   return (
     <div className="min-h-screen font-sans relative">
-      {/* Background Layers */}
       <div className="fixed inset-0 z-0 bg-cover bg-center bg-fixed" style={{ backgroundImage: "url('/island-bg.png')" }} />
       <div className="fixed inset-0 z-1 bg-overlay transition-colors duration-300" />
 
       <div className="relative z-10 text-foreground transition-colors duration-300">
         
-        {/* === NEW GLOBAL NAVIGATION BAR === */}
-        <nav className="sticky top-0 z-50 border-b bg-background/60 backdrop-blur-xl px-6 h-16 flex items-center justify-between border-slate-200/50 dark:border-slate-800/50">
-          <div className="flex items-center gap-4">
+        {/* REBALANCED MOBILE NAV WITH BACK BUTTON */}
+        <nav className="sticky top-0 z-50 border-b bg-background/60 backdrop-blur-xl px-2 sm:px-6 h-16 flex items-center justify-between border-slate-200/50 dark:border-slate-800/50">
+          <div className="flex items-center gap-1 sm:gap-2">
             <button 
                 onClick={() => router.push('/')} 
-                className="p-2 hover:bg-slate-200/20 rounded-full transition-colors text-slate-500"
+                className="p-1 sm:p-2 hover:bg-slate-200/20 rounded-full transition-colors text-slate-500"
             >
-                <ChevronLeft size={24} />
+                <ChevronLeft size={20} className="sm:w-[24px] sm:h-[24px]" />
             </button>
-            <div className="h-8 w-px bg-slate-200/50 dark:bg-slate-800/50 mx-2 hidden sm:block" />
+            <div className="h-6 sm:h-8 w-px bg-slate-200/50 dark:bg-slate-800/50 mx-1 sm:mx-2" />
             <Link href="/" className="flex items-center gap-2">
-                <div className="bg-indigo-600 p-2 rounded-lg text-white shadow-lg"><Brain size={22}/></div>
+                <div className="bg-indigo-600 p-1.5 sm:p-2 rounded-lg text-white shadow-lg"><Brain size={20} className="sm:w-[22px] sm:h-[22px]"/></div>
                 <span className="font-black uppercase tracking-tighter text-sm sm:text-base hidden sm:inline-block">Skealed</span>
             </Link>
           </div>
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2 sm:gap-4">
               <Link href="/ideas" className="hidden sm:flex items-center gap-1.5 text-xs font-bold text-slate-500 hover:text-amber-500 transition-colors uppercase tracking-widest">
              <Lightbulb size={14} /> Suggest Skill
              </Link>
               <ThemeToggle />
               {user ? (
-                  <button onClick={() => supabase.auth.signOut()} className="text-slate-500 hover:text-rose-500 transition-colors"><LogOut size={20}/></button>
-              ) : <Link href="/login" className="text-sm font-bold opacity-70 hover:opacity-100">SIGN IN</Link>}
-              <Link href="/vault" className="bg-indigo-600 text-white px-5 py-2 rounded-full text-xs font-bold shadow-lg active:scale-95 transition-all">Dashboard</Link>
+                  <button onClick={() => supabase.auth.signOut()} className="text-slate-500 hover:text-rose-500 transition-colors p-1"><LogOut size={18} className="sm:w-[20px] sm:h-[20px]"/></button>
+              ) : <Link href="/login" className="text-xs sm:text-sm font-bold opacity-70 hover:opacity-100 whitespace-nowrap">SIGN IN</Link>}
+              <Link href="/vault" className="bg-indigo-600 text-white px-3 py-1.5 sm:px-5 sm:py-2 rounded-full text-[10px] sm:text-xs font-bold shadow-lg active:scale-95 transition-all whitespace-nowrap">Dashboard</Link>
           </div>
         </nav>
-        {/* ================================= */}
 
-        {/* Category Header Controls */}
-        <header className="py-16 text-center">
-          <h1 className="text-5xl font-black mb-10 tracking-tighter capitalize">{categoryTitle}</h1>
-          <div className="max-w-5xl mx-auto px-6 flex flex-col md:flex-row gap-6 items-center justify-between">
+        {/* TIGHTER MOBILE HEADER */}
+        <header className="pt-8 pb-10 sm:py-16 text-center">
+          <h1 className="text-4xl sm:text-5xl font-black mb-6 sm:mb-10 tracking-tighter capitalize leading-tight">{categoryTitle}</h1>
+          <div className="max-w-5xl mx-auto px-4 sm:px-6 flex flex-col md:flex-row gap-4 sm:gap-6 items-center justify-between">
               <div className="relative w-full md:w-96">
                 <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={18}/>
                 <input 
@@ -229,7 +220,8 @@ export default function CategoryPage() {
                 />
               </div>
 
-              <div className="flex bg-slate-200/20 dark:bg-slate-800/40 p-1 rounded-full backdrop-blur-sm border border-slate-200/30 dark:border-slate-700/30">
+              {/* HIGH CONTRAST SEGMENTED CONTROL */}
+              <div className="flex w-full sm:w-auto bg-white/80 dark:bg-slate-900/80 p-1 rounded-xl backdrop-blur-md border border-slate-200 dark:border-slate-700 shadow-sm overflow-x-auto scrollbar-hide">
                 {[
                     { id: 'top', icon: <Trophy size={12}/>, label: 'Top' },
                     { id: 'new', icon: <Clock size={12}/>, label: 'New' },
@@ -238,9 +230,9 @@ export default function CategoryPage() {
                     <button
                         key={btn.id}
                         onClick={() => setSortType(btn.id as SortType)}
-                        className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[10px] font-bold transition-all ${
+                        className={`flex flex-1 sm:flex-none items-center justify-center gap-1.5 px-4 py-2 sm:px-3 sm:py-1.5 rounded-lg text-[10px] font-bold transition-all whitespace-nowrap ${
                             sortType === btn.id 
-                            ? 'bg-indigo-600 text-white shadow-[0_0_10px_rgba(79,70,229,0.4)]' 
+                            ? 'bg-indigo-600 text-white shadow-md' 
                             : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 hover:bg-black/5 dark:hover:bg-white/5'
                         }`}
                     >
@@ -252,7 +244,7 @@ export default function CategoryPage() {
         </header>
 
         {/* 4-Column Responsive Grid */}
-        <main className="max-w-7xl mx-auto p-6 md:p-12">
+        <main className="max-w-7xl mx-auto p-4 sm:p-6 md:p-12 pt-0">
           {loading ? (
             <div className="text-center py-20 font-black text-slate-400 text-3xl animate-pulse uppercase">Loading Skills...</div>
           ) : (
@@ -267,7 +259,7 @@ export default function CategoryPage() {
                     href={`/drills/${skill.slug}`}
                     className="bg-card backdrop-blur-lg border border-slate-200/50 dark:border-slate-800/50 rounded-2xl overflow-hidden shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all group flex flex-col"
                   >
-                    <div className={`h-1 w-full ${voteType === 'up' ? 'bg-emerald-500' : voteType === 'down' ? 'bg-rose-500' : 'bg-indigo-600/30'}`}></div>
+                    <div className={`h-1 w-full shrink-0 ${voteType === 'up' ? 'bg-emerald-500' : voteType === 'down' ? 'bg-rose-500' : 'bg-indigo-600/30'}`}></div>
                     <div className="p-5 flex flex-col flex-grow">
                       <div className="flex justify-between items-start mb-4">
                         <div className="h-9 w-9 bg-indigo-50 dark:bg-slate-800/50 rounded-lg flex items-center justify-center text-indigo-600">
@@ -276,10 +268,8 @@ export default function CategoryPage() {
                         <button onClick={(e) => handleShare(e, skill)} className="p-1.5 text-slate-400 hover:text-indigo-500 transition-colors"><Share2 size={16} /></button>
                       </div>
 
-                      {/* Title with 3-line wrap */}
                       <h3 className="text-base font-bold mb-6 leading-tight h-[60px] line-clamp-3">{skill.title}</h3>
                       
-                      {/* High-Contrast Voting Buttons */}
                       <div className="mt-auto pt-4 border-t border-slate-200/30 flex items-center justify-between">
                         <div className="flex items-center gap-1 bg-slate-100 dark:bg-slate-800 p-1 rounded-full border border-slate-200 dark:border-slate-700 shadow-inner">
                           <button 
