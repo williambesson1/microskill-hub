@@ -17,7 +17,8 @@ import {
   ChevronLeft,
   Trophy,
   Clock,
-  Bookmark
+  Bookmark,
+  Lightbulb
 } from 'lucide-react';
 import { supabase } from '../lib/supabase'; 
 import ThemeToggle from '../components/ThemeToggle'; 
@@ -32,18 +33,19 @@ export default function Home() {
   const [user, setUser] = useState<any>(null);
   const [searchQuery, setSearchQuery] = useState("");
   
-  // Track sort state per category
+  // Track sort state and processing state to prevent spam clicks
+  const [isProcessing, setIsProcessing] = useState<{[key: number]: boolean}>({});
   const [categorySort, setCategorySort] = useState<{[key: string]: SortType}>({});
   const scrollRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
 
   const fetchData = async (currentUser: any) => {
-    // Select created_at for 'New' sorting
     const { data: skillsData } = await supabase.from('skills').select('*').order('votes', { ascending: false });
     setSkills(skillsData || []);
 
     if (currentUser) {
       const { data: votesData } = await supabase.from('user_votes').select('skill_id, vote_type').eq('user_id', currentUser.id);
-      const voteMap = (votesData || []).reduce((acc, v) => ({ ...acc, [v.skill_id]: v.vote_type }), {});
+      // Convert database numbers (1, -1) back to UI strings ('up', 'down')
+      const voteMap = (votesData || []).reduce((acc, v) => ({ ...acc, [v.skill_id]: v.vote_type === 1 ? 'up' : 'down' }), {});
       setUserVotes(voteMap);
 
       const { data: favData } = await supabase.from('user_favorites').select('skill_id').eq('user_id', currentUser.id);
@@ -59,11 +61,13 @@ export default function Home() {
       fetchData(activeUser);
     };
     init();
+    
     const { data: authListener } = supabase.auth.onAuthStateChange((_event, session) => {
       const newUser = session?.user ?? null;
       setUser(newUser);
       fetchData(newUser);
     });
+    
     return () => authListener.subscription.unsubscribe();
   }, []);
 
@@ -75,7 +79,6 @@ export default function Home() {
     }
   };
 
-  // Process skills based on active sort/filter
   const getProcessedSkills = (categoryName: string, categorySkills: any[]) => {
     const sortType = categorySort[categoryName] || 'top';
     let filtered = [...categorySkills];
@@ -95,19 +98,77 @@ export default function Home() {
   const handleVote = async (e: React.MouseEvent, skillId: number, type: 'up' | 'down') => {
     e.preventDefault(); e.stopPropagation();
     if (!user) { alert("Please sign in to vote!"); return; }
-    const currentVote = userVotes[skillId];
     
-    if (currentVote === type) {
-      await supabase.from('user_votes').delete().eq('user_id', user.id).eq('skill_id', skillId);
-      await supabase.rpc(type === 'up' ? 'decrement_votes' : 'increment_votes', { row_id: skillId });
-    } else {
-      await supabase.from('user_votes').upsert({ user_id: user.id, skill_id: skillId, vote_type: type });
-      await supabase.rpc(type === 'up' ? 'increment_votes' : 'decrement_votes', { row_id: skillId });
-      if (currentVote !== null && currentVote !== undefined) {
-        await supabase.rpc(type === 'up' ? 'increment_votes' : 'decrement_votes', { row_id: skillId });
+    // Block double-clicks while processing
+    if (isProcessing[skillId]) return;
+    setIsProcessing(prev => ({ ...prev, [skillId]: true }));
+
+    const currentVote = userVotes[skillId];
+    // Convert 'up'/'down' to 1/-1 for the database
+    const voteValue = type === 'up' ? 1 : -1;
+
+    try {
+      if (currentVote === type) {
+        // TOGGLE OFF
+        setUserVotes(prev => ({ ...prev, [skillId]: null })); // Instant UI update
+        await supabase.from('user_votes').delete().eq('user_id', user.id).eq('skill_id', skillId);
+        await supabase.rpc(type === 'up' ? 'decrement_votes' : 'increment_votes', { row_id: skillId });
+      } else {
+        // NEW VOTE OR SWITCH
+        setUserVotes(prev => ({ ...prev, [skillId]: type })); // Instant UI update
+        
+        // THE FIX: We tell Supabase to look at the exact columns that make up our unique rule
+        const { error } = await supabase.from('user_votes').upsert({ 
+          user_id: user.id, 
+          skill_id: skillId, 
+          vote_type: voteValue 
+        }, { onConflict: 'user_id,skill_id' }); 
+
+        if (error) throw error;
+
+        // Math for total count on the card
+        if (!currentVote) {
+          await supabase.rpc(type === 'up' ? 'increment_votes' : 'decrement_votes', { row_id: skillId });
+        } else {
+          // If switching from Up to Down, adjust by 2 points
+          await supabase.rpc(type === 'up' ? 'increment_votes' : 'decrement_votes', { row_id: skillId });
+          await supabase.rpc(type === 'up' ? 'increment_votes' : 'decrement_votes', { row_id: skillId });
+        }
       }
+      // Silently sync with server to ensure accuracy
+      fetchData(user);
+    } catch (err: any) {
+      console.error("Voting error:", err.message || err);
+      // Revert the UI if the database failed
+      setUserVotes(prev => ({ ...prev, [skillId]: currentVote }));
+    } finally {
+      setIsProcessing(prev => ({ ...prev, [skillId]: false }));
     }
-    fetchData(user);
+  };
+
+  const handleToggleHeart = async (e: React.MouseEvent, skillId: number) => {
+    e.preventDefault(); e.stopPropagation();
+    if (!user) { alert("Please sign in!"); return; }
+    
+    if (isProcessing[skillId]) return;
+    setIsProcessing(prev => ({ ...prev, [skillId]: true }));
+
+    const isFav = userFavorites.includes(skillId);
+    try {
+      if (isFav) {
+        setUserFavorites(prev => prev.filter(id => id !== skillId));
+        await supabase.from('user_favorites').delete().eq('user_id', user.id).eq('skill_id', skillId);
+      } else {
+        setUserFavorites(prev => [...prev, skillId]);
+        await supabase.from('user_favorites').insert({ user_id: user.id, skill_id: skillId });
+      }
+      fetchData(user); 
+    } catch (err) {
+      console.error(err);
+      fetchData(user); // Revert on error
+    } finally {
+      setIsProcessing(prev => ({ ...prev, [skillId]: false }));
+    }
   };
 
   const handleShare = async (e: React.MouseEvent, skill: any) => {
@@ -117,15 +178,6 @@ export default function Home() {
       if (navigator.share) await navigator.share({ title: skill.title, url });
       else { await navigator.clipboard.writeText(url); alert("Link copied!"); }
     } catch (err) { console.log(err); }
-  };
-
-  const handleToggleHeart = async (e: React.MouseEvent, skillId: number) => {
-    e.preventDefault(); e.stopPropagation();
-    if (!user) { alert("Please sign in!"); return; }
-    const isFav = userFavorites.includes(skillId);
-    if (isFav) await supabase.from('user_favorites').delete().eq('user_id', user.id).eq('skill_id', skillId);
-    else await supabase.from('user_favorites').insert({ user_id: user.id, skill_id: skillId });
-    fetchData(user); 
   };
 
   const categories = skills.reduce((acc: any, skill) => {
@@ -146,7 +198,6 @@ export default function Home() {
 
   return (
     <div className="min-h-screen font-sans relative">
-      {/* Background Layers */}
       <div className="fixed inset-0 z-0 bg-cover bg-center bg-fixed" style={{ backgroundImage: "url('/island-bg.png')" }} />
       <div className="fixed inset-0 z-1 bg-overlay transition-colors duration-300" />
 
@@ -154,19 +205,23 @@ export default function Home() {
         <nav className="sticky top-0 z-50 border-b bg-background/60 backdrop-blur-xl px-6 h-16 flex items-center justify-between border-slate-200/50 dark:border-slate-800/50">
           <Link href="/" className="flex items-center gap-2">
               <div className="bg-indigo-600 p-2 rounded-lg text-white shadow-lg"><Brain size={22}/></div>
-              <span className="font-black uppercase tracking-tighter text-sm sm:text-base">MicroSkill Hub</span>
+              <span className="font-black uppercase tracking-tighter text-sm sm:text-base">Skealed</span>
           </Link>
           <div className="flex items-center gap-4">
+            {/* NEW LINK HERE */}
+              <Link href="/ideas" className="hidden sm:flex items-center gap-1.5 text-xs font-bold text-slate-500 hover:text-amber-500 transition-colors uppercase tracking-widest">
+             <Lightbulb size={14} /> Suggest Skill
+             </Link>
               <ThemeToggle />
               {user ? (
                   <button onClick={() => supabase.auth.signOut()} className="text-slate-500 hover:text-rose-500 transition-colors"><LogOut size={20}/></button>
               ) : <Link href="/login" className="text-sm font-bold opacity-70 hover:opacity-100">SIGN IN</Link>}
-              <Link href="/vault" className="bg-indigo-600 text-white px-5 py-2 rounded-full text-xs font-bold shadow-lg active:scale-95 transition-all">MY VAULT</Link>
+              <Link href="/vault" className="bg-indigo-600 text-white px-5 py-2 rounded-full text-xs font-bold shadow-lg active:scale-95 transition-all">Dashboard</Link>
           </div>
         </nav>
 
         <header className="py-20 text-center">
-          <h1 className="text-5xl font-black mb-8 tracking-tighter max-w-4xl mx-auto px-4">Master the Small Things.</h1>
+          <h1 className="text-5xl font-black mb-8 tracking-tighter max-w-4xl mx-auto px-4">Practice skills useful to you</h1>
           <div className="relative max-w-lg mx-auto px-6">
               <Search className="absolute left-10 top-1/2 -translate-y-1/2 text-slate-400" size={18}/>
               <input 
@@ -192,7 +247,6 @@ export default function Home() {
             return (
               <section key={category} className="mb-16 last:mb-0 relative group">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-6 px-1 gap-4">
-                    {/* Clickable Header for Deep Dive */}
                     <Link 
                         href={`/categories/${category.toLowerCase().replace(/\s+/g, '-')}`} 
                         className="group/title inline-flex items-center gap-2"
@@ -238,6 +292,7 @@ export default function Home() {
                   {filtered.length > 0 ? filtered.map((skill: any) => {
                     const voteType = userVotes[skill.id];
                     const isFav = userFavorites.includes(skill.id);
+                    const isCardLoading = isProcessing[skill.id];
                     return (
                       <Link 
                         key={skill.id} 
@@ -255,11 +310,11 @@ export default function Home() {
                           <h3 className="text-base font-bold mb-6 leading-tight h-[40px] line-clamp-2">{skill.title}</h3>
                           <div className="mt-auto pt-4 border-t border-slate-200/30 flex items-center justify-between">
                             <div className="flex items-center gap-1 bg-slate-100/50 dark:bg-slate-800/50 p-1 rounded-full">
-                              <button onClick={(e) => handleVote(e, skill.id, 'up')} className={`p-1 rounded-full transition-all ${voteType === 'up' ? 'bg-emerald-500 text-white shadow-sm' : 'text-slate-400 hover:text-emerald-500'}`}><ArrowUp size={14} strokeWidth={3}/></button>
+                              <button disabled={isCardLoading} onClick={(e) => handleVote(e, skill.id, 'up')} className={`p-1 rounded-full transition-all ${voteType === 'up' ? 'bg-emerald-500 text-white shadow-sm' : 'text-slate-400 hover:text-emerald-500'}`}><ArrowUp size={14} strokeWidth={3}/></button>
                               <span className={`px-1 text-[10px] font-black ${voteType === 'up' ? 'text-emerald-600' : voteType === 'down' ? 'text-rose-600' : 'text-slate-500'}`}>{skill.votes}</span>
-                              <button onClick={(e) => handleVote(e, skill.id, 'down')} className={`p-1 rounded-full transition-all ${voteType === 'down' ? 'bg-rose-500 text-white shadow-sm' : 'text-slate-400 hover:text-rose-500'}`}><ArrowDown size={14} strokeWidth={3}/></button>
+                              <button disabled={isCardLoading} onClick={(e) => handleVote(e, skill.id, 'down')} className={`p-1 rounded-full transition-all ${voteType === 'down' ? 'bg-rose-500 text-white shadow-sm' : 'text-slate-400 hover:text-rose-500'}`}><ArrowDown size={14} strokeWidth={3}/></button>
                             </div>
-                            <button onClick={(e) => handleToggleHeart(e, skill.id)} className={`p-1.5 rounded-full transition-all ${isFav ? 'text-rose-500 scale-110' : 'text-slate-300 hover:text-rose-400'}`}><Heart size={18} fill={isFav ? "currentColor" : "none"} /></button>
+                            <button disabled={isCardLoading} onClick={(e) => handleToggleHeart(e, skill.id)} className={`p-1.5 rounded-full transition-all ${isFav ? 'text-rose-500 scale-110' : 'text-slate-300 hover:text-rose-400'}`}><Heart size={18} fill={isFav ? "currentColor" : "none"} /></button>
                           </div>
                         </div>
                       </Link>

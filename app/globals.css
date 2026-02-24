@@ -8,17 +8,19 @@
 }
 
 :root {
-  --background: #f8fafc; /* slate-50 */
-  --foreground: #0f172a; /* slate-900 */
-  --card: #ffffff;
-  --overlay: rgba(248, 250, 252, 0.85); /* Light tint */
+  --background: #f8fafc;
+  --foreground: #0f172a;
+  /* Glass Effect: 80% white with transparency */
+  --card: rgba(255, 255, 255, 0.8); 
+  --overlay: rgba(248, 250, 252, 0.85);
 }
 
 .dark {
-  --background: #020617; /* slate-950 */
-  --foreground: #f8fafc; /* slate-50 */
-  --card: #0f172a;       /* slate-900 */
-  --overlay: rgba(2, 6, 23, 0.9); /* Dark blue tint */
+  --background: #020617;
+  --foreground: #f8fafc;
+  /* Glass Effect: 80% slate-900 with transparency */
+  --card: rgba(15, 23, 42, 0.8);
+  --overlay: rgba(2, 6, 23, 0.9);
 }
 
 @layer base {
@@ -31,12 +33,14 @@
 
 @layer utilities {
   .scroll-smooth-custom {
-  scroll-behavior: smooth;
-}
-  .cursor-grab {
-    cursor: grab;
+    scroll-behavior: smooth;
   }
-  .cursor-grabbing {
-    cursor: grabbing;
+  /* Important for the horizontal row feel */
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
   }
 }
