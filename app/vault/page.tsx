@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { 
   ArrowLeft, LogOut, Shield, GraduationCap, Brain, 
   Zap, Heart, ArrowUp, User, Camera, Trash2, Search, 
-  X, ChevronLeft, ChevronRight 
+  X, ChevronLeft, ChevronRight, Lightbulb
 } from 'lucide-react';
 import { supabase } from '../../lib/supabase'; 
 import ThemeToggle from '../../components/ThemeToggle';
@@ -120,10 +120,31 @@ export default function Dashboard() {
       <div className="fixed inset-0 z-1 bg-overlay transition-colors duration-300" />
 
       <div className="relative z-10 text-foreground">
-        <nav className="sticky top-0 z-50 border-b bg-background/60 backdrop-blur-xl px-6 h-16 flex items-center justify-between border-slate-200/50 dark:border-slate-800/50">
-          <Link href="/" className="flex items-center gap-2 font-bold text-indigo-600"><ArrowLeft size={20} /> <span className="text-xs font-black uppercase tracking-widest">Back</span></Link>
-          <div className="flex items-center gap-4"><ThemeToggle /><button onClick={handleSignOut} className="p-2 text-slate-400 hover:text-rose-500 transition-colors"><LogOut size={20}/></button></div>
+        
+        {/* === UNIFIED GLOBAL NAVIGATION BAR === */}
+        <nav className="sticky top-0 z-50 border-b bg-background/60 backdrop-blur-xl px-4 sm:px-6 h-16 flex items-center justify-between border-slate-200/50 dark:border-slate-800/50">
+          <div className="flex items-center gap-1 sm:gap-2">
+            <Link 
+                href="/" 
+                className="p-1 sm:p-2 hover:bg-slate-200/20 rounded-full transition-colors text-slate-500"
+            >
+                <ChevronLeft size={20} className="sm:w-[24px] sm:h-[24px]" />
+            </Link>
+            <div className="h-6 sm:h-8 w-px bg-slate-200/50 dark:bg-slate-800/50 mx-1 sm:mx-2" />
+            <Link href="/" className="flex items-center gap-2">
+                <div className="bg-indigo-600 p-1.5 sm:p-2 rounded-lg text-white shadow-lg"><Brain size={20} className="sm:w-[22px] sm:h-[22px]"/></div>
+                <span className="font-black uppercase tracking-tighter text-sm sm:text-base hidden sm:inline-block">Skealed</span>
+            </Link>
+          </div>
+          <div className="flex items-center gap-2 sm:gap-4">
+              <Link href="/ideas" className="hidden sm:flex items-center gap-1.5 text-xs font-bold text-slate-500 hover:text-amber-500 transition-colors uppercase tracking-widest">
+             <Lightbulb size={14} /> Suggest Skill
+             </Link>
+              <ThemeToggle />
+              <button onClick={handleSignOut} className="text-slate-500 hover:text-rose-500 transition-colors p-1"><LogOut size={18} className="sm:w-[20px] sm:h-[20px]"/></button>
+          </div>
         </nav>
+        {/* ===================================== */}
 
         <main className="mx-auto max-w-5xl px-6 py-12">
           {/* Dashboard Header */}
