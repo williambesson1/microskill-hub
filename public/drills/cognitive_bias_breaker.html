@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Bias Breaker Masterclass</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .fade-in { animation: fadeIn 0.4s ease-in-out forwards; }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .choice-btn { transition: all 0.2s ease; }
+        .choice-btn:hover:not(:disabled) { transform: scale(1.01); }
+    </style>
+</head>
+<body class="bg-slate-50 min-h-screen flex items-center justify-center p-4 sm:p-6 text-slate-800">
+
+    <div class="max-w-3xl w-full bg-white rounded-[2rem] shadow-2xl shadow-slate-200/50 overflow-hidden relative min-h-[550px] flex flex-col border border-slate-100">
+        
+        <div id="screen-start" class="p-8 sm:p-10 flex flex-col h-full flex-grow">
+            <div class="inline-flex items-center justify-center w-16 h-16 bg-indigo-50 text-indigo-600 rounded-2xl mb-6 text-3xl shadow-sm">🧠</div>
+            <h1 class="text-3xl font-bold text-slate-900 mb-4 tracking-tight">The Bias Breaker Pro</h1>
+            <p class="text-lg font-medium text-indigo-600 mb-6 leading-relaxed">
+                Mastering the art of overriding your brain's flawed shortcuts will save you from career-killing mistakes, financial leaks, and relationship drama.
+            </p>
+            
+            <div class="w-full flex justify-center my-4 text-center text-sm text-slate-500 bg-slate-50 rounded-2xl p-4 border border-slate-100">
+                
+            </div>
+
+            <div class="bg-slate-50 p-6 rounded-3xl border border-slate-100 mb-8">
+                <h2 class="text-sm uppercase tracking-wider font-bold text-slate-500 mb-2">The Mental Model</h2>
+                <p class="text-slate-700 leading-relaxed">
+                    Your brain is wired to save energy by relying on an automatic, fast "autopilot" system that is easily duped by emotion, peer pressure, and context. To make bulletproof decisions, you have to hit pause, spot the hidden mental glitch, and tag in your deliberate, analytical "thinker".
+                </p>
+            </div>
+
+            <button onclick="app.startDrill()" class="mt-auto w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-4 px-8 rounded-2xl shadow-lg shadow-indigo-200 transition-all duration-200 transform hover:-translate-y-1 text-lg flex justify-center items-center gap-2">
+                Start the Drill <span>⚡</span>
+            </button>
+        </div>
+
+        <div id="screen-drill" class="hidden flex-col h-full flex-grow relative">
+            <div class="w-full bg-slate-100 h-2">
+                <div id="progress-bar" class="bg-indigo-600 h-2 transition-all duration-500 ease-out" style="width: 0%"></div>
+            </div>
+
+            <div class="p-8 sm:p-10 flex-grow flex flex-col">
+                <div class="flex items-center gap-3 mb-6">
+                    <span id="scenario-icon" class="text-2xl bg-slate-100 p-2 rounded-xl">💼</span>
+                    <h2 id="scenario-title" class="text-xl font-bold text-slate-800">Scenario</h2>
+                    <span class="ml-auto text-sm font-semibold text-slate-400 bg-slate-100 px-3 py-1 rounded-full" id="progress-text">1 / 6</span>
+                </div>
+
+                <div class="bg-slate-50 border-l-4 border-indigo-500 p-6 rounded-r-2xl mb-8 shadow-sm">
+                    <p id="scenario-text" class="text-slate-700 text-lg leading-relaxed"></p>
+                </div>
+
+                <div id="choices-container" class="space-y-3 mb-8"></div>
+
+                <div id="feedback-container" class="hidden mt-auto">
+                    <div id="feedback-box" class="p-5 rounded-2xl mb-6 border">
+                        <div class="flex items-center gap-2 mb-2">
+                            <span id="feedback-icon" class="text-xl">✅</span>
+                            <h3 id="feedback-heading" class="font-bold text-lg"></h3>
+                        </div>
+                        <p id="feedback-text" class="text-slate-700 leading-relaxed"></p>
+                    </div>
+                    <button onclick="app.nextScenario()" class="w-full bg-slate-900 hover:bg-slate-800 text-white font-semibold py-4 px-8 rounded-2xl shadow-md transition-all duration-200 flex justify-center items-center gap-2">
+                        Next Scenario <span class="text-xl">→</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div id="screen-end" class="hidden p-8 sm:p-10 flex-col h-full flex-grow">
+            <div class="text-center mb-6">
+                <div class="inline-flex items-center justify-center w-20 h-20 bg-emerald-50 text-emerald-600 rounded-3xl mb-4 text-4xl shadow-sm">🏆</div>
+                <h1 class="text-3xl font-bold text-slate-900 mb-2">Drill Complete!</h1>
+                <p id="final-score" class="text-xl font-semibold text-indigo-600"></p>
+            </div>
+
+            <div class="w-full flex justify-center my-4 text-center text-sm text-slate-500 bg-slate-50 rounded-2xl p-4 border border-slate-100">
+                
+            </div>
+
+            <div class="bg-slate-50 border border-slate-100 rounded-3xl p-6 mb-8 flex-grow">
+                <h2 class="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2">📋 Bias Breaker Cheat Sheet</h2>
+                <ul class="space-y-4">
+                    <li class="flex gap-3">
+                        <span class="text-indigo-500 mt-0.5 text-lg">📊</span>
+                        <div>
+                            <strong class="text-slate-800 block">Data Over Drama</strong>
+                            <span class="text-slate-600 text-sm">Ignore vivid, emotional stories and recent events. Rely on historical averages.</span>
+                        </div>
+                    </li>
+                    <li class="flex gap-3">
+                        <span class="text-indigo-500 mt-0.5 text-lg">🚫</span>
+                        <div>
+                            <strong class="text-slate-800 block">Ignore Sunk Costs</strong>
+                            <span class="text-slate-600 text-sm">Never make decisions based on past time or money spent; optimize for future value.</span>
+                        </div>
+                    </li>
+                    <li class="flex gap-3">
+                        <span class="text-indigo-500 mt-0.5 text-lg">🕵️</span>
+                        <div>
+                            <strong class="text-slate-800 block">Hunt for the Disconfirming</strong>
+                            <span class="text-slate-600 text-sm">Actively search for reasons why your ideas will fail, not just proof that you're right.</span>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+
+            <button onclick="app.restartDrill()" class="mt-auto w-full bg-slate-200 hover:bg-slate-300 text-slate-800 font-semibold py-4 px-8 rounded-2xl transition-all duration-200 flex justify-center items-center gap-2">
+                Play Another Round (New Scenarios) <span>🔄</span>
+            </button>
+        </div>
+
+    </div>
+
+    <script>
+        // Data Set: Combines 30 Core + 10 Intermediate + 10 Advanced Scenarios (50 Total)
+        const allScenarios = [
+            // --- 30 CORE SCENARIOS ---
+            { title: "Project Management", icon: "📈", situation: "You’re six months and $50,000 into rolling out new software, but it's riddled with bugs and a competitor just released a cheaper, vastly superior tool.", choices: [ { text: "Push forward because you can’t stomach the idea of 'wasting' the 50 grand and hard work.", isCorrect: false }, { text: "Run both systems simultaneously so you don't look like a failure to leadership.", isCorrect: false }, { text: "Scrap the software rollout immediately and pivot to the competitor's tool.", isCorrect: true } ], feedback: "The Sunk Cost Fallacy: time and money are already gone; rational decisions must be based entirely on future costs and benefits." },
+            { title: "Hiring & Recruitment", icon: "🤝", situation: "You’re interviewing a candidate who is incredibly charismatic, dresses perfectly, and went to an elite Ivy League school.", choices: [ { text: "Hire them on the spot because they 'feel' like a high performer.", isCorrect: false }, { text: "Ignore their charm, administer a standard data skills test, and grade it blind.", isCorrect: true }, { text: "Assume their degree automatically translates into elite coding skills.", isCorrect: false } ], feedback: "The Halo Effect causes us to let one shining attribute blind us to hard facts. Separate the presentation from the hard skills." },
+            { title: "Office Politics", icon: "🏛️", situation: "In a meeting, the CEO pitches a new strategy. The first four executives immediately nod and praise it, even though you spot a massive flaw.", choices: [ { text: "Politely but firmly voice your concern, playing devil's advocate.", isCorrect: true }, { text: "Bite your tongue because you don't want to look like a naysayer.", isCorrect: false }, { text: "Agree in the meeting but complain via Slack right after.", isCorrect: false } ], feedback: "Groupthink and Social Proof override common sense. Speaking up shatters the 'illusion of unanimity'." },
+            { title: "Time Management", icon: "⏳", situation: "You are tasked with writing a quarterly report; you map out an ideal schedule showing you can finish by Friday.", choices: [ { text: "Commit to Friday assuming you won't get interrupted.", isCorrect: false }, { text: "Create an even more detailed spreadsheet of your Friday plan.", isCorrect: false }, { text: "Look at how long past reports actually took, and base your deadline on that historical average.", isCorrect: true } ], feedback: "The Planning Fallacy makes us overly optimistic. Use the 'outside view' and historical data, not best-case scenarios." },
+            { title: "Performance Reviews", icon: "📝", situation: "It's time to write an annual evaluation, but all you can think about is a client presentation they messed up last week.", choices: [ { text: "Give them a poor rating because the failure feels so massive right now.", isCorrect: false }, { text: "Review their metrics from the entire year to ensure one event doesn't skew the rating.", isCorrect: true }, { text: "Assume the fresh mistake represents their overall competence.", isCorrect: false } ], feedback: "The Availability Bias gives too much weight to recent, memorable events. Rely on long-term data." },
+            { title: "Salary Negotiation", icon: "💰", situation: "The recruiter says, 'The budget for this role is around $70,000,' which is $20,000 less than you wanted.", choices: [ { text: "Adjust down to $75,000, feeling like you successfully negotiated an increase.", isCorrect: false }, { text: "Instantly accept because $70,000 is stuck in your head.", isCorrect: false }, { text: "Ignore their number, state your researched market value ($90k), and refuse to negotiate from their baseline.", isCorrect: true } ], feedback: "Anchoring pulls counter-offers toward the first number mentioned. You must actively reset the baseline." },
+            { title: "Crisis Management", icon: "🚨", situation: "A major client sends a furious email threatening to cancel their contract. Your pulse skyrockets.", choices: [ { text: "Fire back a defensive email just to feel like you are 'doing something'.", isCorrect: false }, { text: "Close your laptop, take a walk, and wait until you are calm to assess before responding.", isCorrect: true }, { text: "Throw your team under the bus to appease the client.", isCorrect: false } ], feedback: "The Action Bias gives us an irrational urge to act immediately to relieve anxiety. Waiting prevents panic-induced damage." },
+            { title: "Strategy Formulation", icon: "♟️", situation: "You pitch a new strategy and search the internet for case studies of companies that successfully used it.", choices: [ { text: "Actively search for examples of companies that tried this strategy and failed.", isCorrect: true }, { text: "Only gather successful case studies as proof that your idea is flawless.", isCorrect: false }, { text: "Brush off any colleague who points out flaws.", isCorrect: false } ], feedback: "Confirmation Bias filters out contradictory info. Actively hunt for evidence that proves you wrong to truly bulletproof a strategy." },
+            { title: "Career Moves", icon: "🚀", situation: "You’re offered a dynamic new role, but it means leaving your secure job of five years.", choices: [ { text: "Reject the offer because the fear of failing feels stronger than the excitement.", isCorrect: false }, { text: "Evaluate the new job objectively against long-term goals, ignoring temporary discomfort.", isCorrect: true }, { text: "Demand an absurdly high salary to compensate for leaving your comfort zone.", isCorrect: false } ], feedback: "Loss Aversion wires us to feel losses twice as intensely as gains. Recognize the exaggerated fear to take necessary leaps." },
+            { title: "Cross-Department Comm", icon: "📧", situation: "A colleague replies to your urgent request with a blunt, one-word email: 'No.'", choices: [ { text: "Assume they are a massive jerk trying to sabotage you.", isCorrect: false }, { text: "Fire back a passive-aggressive email CCing their manager.", isCorrect: false }, { text: "Assume they are incredibly busy, rushing, or answering from a phone.", isCorrect: true } ], feedback: "The Fundamental Attribution Error makes us overestimate character flaws and underestimate situational constraints." },
+            { title: "Shopping / Decoy Effect", icon: "🛒", situation: "You see three TVs: a 36-inch for $690, a 42-inch for $850, and a 50-inch for $1,480.", choices: [ { text: "Ignore the middle option, determine your budget, and evaluate without side-by-side comparison.", isCorrect: true }, { text: "Buy the 42-inch because it feels like the smartest 'sweet spot'.", isCorrect: false }, { text: "Buy the $1,480 TV to guarantee premium features.", isCorrect: false } ], feedback: "Retailers use the 'Decoy Effect' (the wildly expensive one) to make the middle option look like a bargain." },
+            { title: "E-Commerce", icon: "📦", situation: "You have a $16 book in your cart. 'Free Shipping over $25', standard shipping is $4.", choices: [ { text: "Add a $10 item you don't really need just to 'save' money on shipping.", isCorrect: false }, { text: "Pay the $4 shipping fee and get exactly what you came for.", isCorrect: true }, { text: "Abandon the cart entirely out of frustration.", isCorrect: false } ], feedback: "The concept of 'FREE!' makes us irrational. You end up spending $26 to 'save' $4." },
+            { title: "Car Buying", icon: "🚗", situation: "You negotiated a car for $25,000. The dealer casually asks if you want leather seats for 'just $3,000'.", choices: [ { text: "Say yes because, compared to $25k, $3k feels like pocket change.", isCorrect: false }, { text: "Evaluate the $3,000 strictly on its own merits—would you drop $3k on a leather sofa?", isCorrect: true }, { text: "Agree to every minor upgrade since you are already spending so much.", isCorrect: false } ], feedback: "The Contrast Effect makes a $3,000 upgrade feel tiny next to $25,000. Evaluate absolute cash value." },
+            { title: "Personal Finance", icon: "💵", situation: "You get an unexpected $2,000 bonus. You have credit card debt but want a luxury vacation.", choices: [ { text: "Put the entire $2,000 toward debt, treating it like your weekly paycheck.", isCorrect: true }, { text: "Splurge on a cruise because the money feels like a 'free' windfall.", isCorrect: false }, { text: "Put half to debt and take the rest to the casino.", isCorrect: false } ], feedback: "The House-Money Effect makes us treat unexpected cash frivolously. To your net worth, $2k is $2k regardless of its source." },
+            { title: "Investing", icon: "💹", situation: "You need $5k. You own TechCorp (up $5k) and AutoCorp (down $5k).", choices: [ { text: "Sell the winning stock to lock in 'success' and hold the loser.", isCorrect: false }, { text: "Sell the losing stock for tax benefits and keep the strong winner.", isCorrect: true }, { text: "Sell both to 'clear the slate', triggering unnecessary taxes.", isCorrect: false } ], feedback: "The Disposition Effect causes investors to prematurely sell winners and disastrously hold losers." },
+            { title: "Subscriptions", icon: "📺", situation: "You take a '30-day money-back guarantee' for premium cable, intending to cancel on day 29.", choices: [ { text: "Keep it because 'losing' the channels now feels painful.", isCorrect: false }, { text: "Convince yourself you’ll cancel 'next month'.", isCorrect: false }, { text: "Set an alarm for day 29, evaluate actual usage, and ruthlessly cancel it.", isCorrect: true } ], feedback: "The Endowment Effect states that possessing something makes us overvalue it. Canceling feels like a painful loss." },
+            { title: "Real Estate Negotiation", icon: "🏠", situation: "You are buying a house. The seller asks $450,000.", choices: [ { text: "Offer $430k and feel like a master negotiator.", isCorrect: false }, { text: "Ignore their price completely, research comps, and make a data-backed counteroffer.", isCorrect: true }, { text: "Throw out a low-ball offer of $200k in anger.", isCorrect: false } ], feedback: "Anchoring pulls estimates toward the first number. If you negotiate downward from their anchor, you still overpay." },
+            { title: "Investing / Sunk Cost", icon: "📉", situation: "Shares bought at $50 drop to $20. Fundamentals are terrible, but you don't want to sell until it 'bounces back'.", choices: [ { text: "Hold the stock indefinitely because selling makes the loss 'real'.", isCorrect: false }, { text: "Buy more shares to 'average down'.", isCorrect: false }, { text: "Sell immediately and invest the $20/share in an asset with actual growth potential.", isCorrect: true } ], feedback: "Rational decisions must be based entirely on future potential, ignoring past costs." },
+            { title: "Real Estate / Scarcity", icon: "🔑", situation: "Looking at a plot of land, the agent mentions a doctor saw it yesterday and is 'very interested'.", choices: [ { text: "Panic and immediately make a full-price offer.", isCorrect: false }, { text: "Assess the property strictly on objective price and utility, ignoring the phantom doctor.", isCorrect: true }, { text: "Offer over asking price just to beat the other buyer.", isCorrect: false } ], feedback: "Perception of scarcity causes a lapse in clear thinking, tricking us into assigning high value out of FOMO." },
+            { title: "Online Bidding", icon: "🔨", situation: "Bidding on a watch. Your max is $100. Someone outbids you at $105.", choices: [ { text: "Bump your bid to $115 because you feel 'virtual ownership'.", isCorrect: false }, { text: "Walk away. You set a max value; let them overpay.", isCorrect: true }, { text: "Engage in a frantic bidding war until you win for $200.", isCorrect: false } ], feedback: "The Winner's Curse dictates the auction winner usually overpays due to emotion." },
+            { title: "Health / The Power of FREE", icon: "🍩", situation: "Watching your diet, someone brings a box of free donuts to the breakroom.", choices: [ { text: "Eat them because you feel you're missing out on a deal.", isCorrect: false }, { text: "Rationalize that because they are free, calories don't count.", isCorrect: false }, { text: "Ignore the 'free' label and ask if you'd actually pay money for it right now.", isCorrect: true } ], feedback: "Zero cost derails rational analysis. Stripping away the 'free' label prevents bad consumption." },
+            { title: "Relationships / FAE", icon: "💔", situation: "Your partner leaves dirty dishes. You feel resentment, assuming they are lazy.", choices: [ { text: "Pause and look for situational factors, like them rushing to a meeting.", isCorrect: true }, { text: "Start an argument attacking their core character.", isCorrect: false }, { text: "Assume they left it deliberately to disrespect you.", isCorrect: false } ], feedback: "We overestimate character flaws and underestimate situational constraints." },
+            { title: "Daily Life / Ego Depletion", icon: "🔋", situation: "You come home after a grueling, decision-heavy day and feel like snapping at your family.", choices: [ { text: "Recognize your mental battery is drained, avoid big talks, and restore energy first.", isCorrect: true }, { text: "Power through a serious relationship discussion anyway.", isCorrect: false }, { text: "Believe you are inherently a moody person.", isCorrect: false } ], feedback: "Willpower draws on limited energy. Restoring physical energy delays emotional meltdowns." },
+            { title: "Health / Sunk Cost", icon: "🏋️", situation: "You bought an expensive, non-refundable gym membership, but injured your shoulder.", choices: [ { text: "Push through the pain to 'get your money's worth'.", isCorrect: false }, { text: "Go sit miserably in the sauna so you aren't a financial failure.", isCorrect: false }, { text: "Stop going immediately, focus on recovery, and write off the fee.", isCorrect: true } ], feedback: "The money is unrecoverable. Health decisions must be based on future well-being." },
+            { title: "Daily Life / Availability Bias", icon: "📱", situation: "You spend an hour doomscrolling stories about freak accidents, leaving you terrified.", choices: [ { text: "Cancel travel plans because the world 'feels' dangerous.", isCorrect: false }, { text: "Remind yourself the media over-reports dramatic events, and check actual statistics.", isCorrect: true }, { text: "Research the threat more, feeding your anxiety.", isCorrect: false } ], feedback: "Our brains judge likelihood by how easily a vivid example comes to mind." },
+            { title: "Relationships / Peak-End", icon: "🗺️", situation: "You have a relaxing week-long vacation, but get lost on the drive home and argue.", choices: [ { text: "Declare the entire vacation 'ruined'.", isCorrect: false }, { text: "Consciously remind yourself of the six beautiful days, overriding the bad final memory.", isCorrect: true }, { text: "Refuse to ever travel with them again.", isCorrect: false } ], feedback: "Memories are heavily distorted by the final moments. Actively recall the total duration." },
+            { title: "Health / Discounting", icon: "🏃", situation: "6:00 AM alarm for a run, but your warm bed feels amazing.", choices: [ { text: "Rely purely on sheer willpower in the moment.", isCorrect: false }, { text: "Promise yourself you'll go after work (which you'll skip).", isCorrect: false }, { text: "Use a pre-commitment strategy, like meeting a friend, to face a social penalty for bailing.", isCorrect: true } ], feedback: "We overvalue immediate comfort. Locking into a commitment while 'cool' forces action." },
+            { title: "Health / Placebo Effect", icon: "💊", situation: "At the pharmacy: a $2 generic painkiller vs. a flashy $15 brand-name with identical ingredients.", choices: [ { text: "Buy the $15 brand-name assuming a higher price means better relief.", isCorrect: false }, { text: "Buy the $2 generic brand and consciously remind yourself the chemicals are exactly the same.", isCorrect: true }, { text: "Buy the generic but assume it won't work well.", isCorrect: false } ], feedback: "Our brains associate high prices with quality. Reflecting on identical ingredients breaks the illusion." },
+            { title: "Relationships / Norms", icon: "🍽️", situation: "Your partner spends all weekend cooking a spectacular dinner.", choices: [ { text: "Give them a warm hug, pour wine, and enthusiastically express gratitude.", isCorrect: true }, { text: "Offer them $100 for their hard work.", isCorrect: false }, { text: "Tell them you'll cook next time so you are 'even'.", isCorrect: false } ], feedback: "Injecting market norms (money, strict ledgers) into romantic relationships destroys the social bond." },
+            { title: "Daily Life / Self-Herding", icon: "☕", situation: "You ordered a $6 latte daily because you were stressed last month. Now it's an autopilot habit.", choices: [ { text: "Upgrade to a $7 size since you are already spending $6.", isCorrect: false }, { text: "Question if you enjoy it enough to justify the cost, and try coffee at home.", isCorrect: true }, { text: "Assume it represents your core preferences.", isCorrect: false } ], feedback: "Self-herding happens when we blindly repeat past random behaviors." },
+
+            // --- 10 INTERMEDIATE SCENARIOS ---
+            { title: "Project Management", icon: "📅", situation: "You've detailed a software migration taking 4 months and $100k via a meticulous internal spreadsheet.", choices: [ { text: "Ignore the spreadsheet. Find out how long similar migrations actually took at other companies and use that average.", isCorrect: true }, { text: "Trust the spreadsheet, but add a standard 20% 'buffer'.", isCorrect: false }, { text: "Hold an alignment meeting to get public commitment to the 4-month timeline.", isCorrect: false } ], feedback: "The Planning Fallacy occurs using the 'inside view'. You must use the 'outside view' and historical statistics of similar ventures." },
+            { title: "Team Leadership", icon: "📊", situation: "Sales had a record Q1, so you praised them. In Q2, performance plummeted. A co-manager suggests strict discipline.", choices: [ { text: "Recognize Q2 is likely statistical regression to the average; avoid overreacting.", isCorrect: true }, { text: "Discipline the team immediately; praise made them complacent.", isCorrect: false }, { text: "Send the bottom 10% on intensive training to quickly bring numbers up.", isCorrect: false } ], feedback: "Regression to the Mean: extreme performance is almost always followed by more average performance, regardless of praise or punishment." },
+            { title: "Pricing Strategy", icon: "🏷️", situation: "Your SaaS has Basic ($50/mo) and Pro ($150/mo). Customers overwhelmingly choose Basic, hurting revenue.", choices: [ { text: "Introduce a 'Pro Minus' tier for $150 with fewer features, making the real Pro look like a bargain.", isCorrect: true }, { text: "Lower the Pro tier to $120 to bridge the gap.", isCorrect: false }, { text: "Heavily discount the Basic tier for 6 months, then upsell.", isCorrect: false } ], feedback: "The Decoy Effect: Introducing an obviously inferior option at the same price mathematically nudges buyers toward the premium choice." },
+            { title: "Performance Evaluation", icon: "📈", situation: "A junior manager took an unauthorized gamble with 80% of the budget on an unproven influencer. It generated a 500% ROI.", choices: [ { text: "Reprimand the manager for the reckless, flawed decision process despite the financial result.", isCorrect: true }, { text: "Promote the manager for bold initiative and high ROI.", isCorrect: false }, { text: "Let it slide since it worked, but casually remind the team about approvals.", isCorrect: false } ], feedback: "Outcome Bias tricks us into evaluating decisions based on results rather than process. A foolish gamble is still a bad decision." },
+            { title: "Crisis Management", icon: "📉", situation: "Your stock portfolio drops an unexplained 8%. News is panicking, clients are calling.", choices: [ { text: "Do absolutely nothing. Wait for volatility to pass and stick to the strategy.", isCorrect: true }, { text: "Sell off volatile assets and move to safe bonds.", isCorrect: false }, { text: "Use the dip to aggressively buy new stocks to show you are proactive.", isCorrect: false } ], feedback: "Action Bias compels us to 'do something' to look in control. In complex systems, rapid reactive interventions usually cause damage." },
+            { title: "Employee Motivation", icon: "💻", situation: "Top salaried engineers must work the weekend to hit a critical deadline. They are exhausted.", choices: [ { text: "Order premium catering, stay with them, and frame it as a heroic team mission.", isCorrect: true }, { text: "Offer each a $200 cash bonus for their weekend.", isCorrect: false }, { text: "Tell them failure means losing a client and affects future raises.", isCorrect: false } ], feedback: "Small cash shifts the frame from Social Norms to Market Norms, breeding resentment. Social appeals tap into pride and duty." },
+            { title: "Venture Capital", icon: "🍽️", situation: "Investing in a charismatic founder's restaurant. Great location, works 80 hours/week. Looks like a guaranteed success.", choices: [ { text: "Heavily weigh that 60% of restaurants fail in 3 years; view it as highly risky regardless of traits.", isCorrect: true }, { text: "Invest heavily because specific attributes override general statistics.", isCorrect: false }, { text: "Interview the founder on marketing to ensure they are prepared.", isCorrect: false } ], feedback: "Base-Rate Neglect causes us to be blinded by a vivid narrative while ignoring fundamental statistical probabilities." },
+            { title: "Product Development", icon: "🚫", situation: "Spent 2 years and $2M on software. Right before launch, a competitor releases a superior, cheaper product.", choices: [ { text: "Cancel the launch, write off $2M, and immediately pivot to a viable project.", isCorrect: true }, { text: "Launch anyway, spend $500k on marketing to recoup some investment.", isCorrect: false }, { text: "Delay 6 months and spend $1M to add features to compete.", isCorrect: false } ], feedback: "Sunk Cost Fallacy: Rational decisions must be based strictly on future costs/benefits. Past investments are entirely irrelevant." },
+            { title: "Risk Assessment", icon: "🛡️", situation: "Choosing health plans. Plan A reduces illness risk from 5% to 2%. Plan B reduces risk from 1% to 0%.", choices: [ { text: "Choose Plan A, because it saves 3 out of 100 employees (vs 1 for Plan B).", isCorrect: true }, { text: "Choose Plan B, because hitting 0% provides total peace of mind.", isCorrect: false }, { text: "Offer both and let employees vote democratically.", isCorrect: false } ], feedback: "Zero-Risk Bias tricks us into overvaluing the absolute elimination of a small risk over a mathematically superior reduction in a bigger risk." },
+            { title: "Strategy Analysis", icon: "📚", situation: "Reading books on the habits of Apple, Google, and Amazon CEOs to build a startup.", choices: [ { text: "Stop reading them. Seek data on failed startups that used those exact same strategies but went bankrupt.", isCorrect: true }, { text: "Meticulously copy their daily routines and practices.", isCorrect: false }, { text: "Synthesize commonalities to find 'core principles' guaranteeing success.", isCorrect: false } ], feedback: "Survivorship Bias distorts success by hiding failures. If failed companies used the same strategies, the strategies aren't the cause of success." },
+
+            // --- 10 ADVANCED SCENARIOS ---
+            { title: "Vendor Negotiations", icon: "🤝", situation: "Vendor A offers Premium for $145k. Vendor B offers Basic for $85k. Vendor A suddenly updates: Premium PLUS 24/7 Support for $145k.", choices: [ { text: "Mentally delete the original $145k offer, ignore the 'free' upgrade, and strictly compare the $85k Basic vs $145k Premium+Support.", isCorrect: true }, { text: "Sign the $145k Premium+Support because it feels like an unbelievable bargain.", isCorrect: false }, { text: "Use $145k as a baseline to negotiate down to $135k.", isCorrect: false } ], feedback: "The Decoy Effect (Relativity): Vendor A introduced an inferior 'decoy' to make the new package look like a massive relative win. Assess absolute value." },
+            { title: "IT Project Gamble", icon: "🎲", situation: "14 months and $4.2M into a project, the vendor goes bankrupt. Pay $2.5M for guaranteed new system, or $2M to patch (75% chance of total failure, 25% chance of working).", choices: [ { text: "Swallow the humiliation of a $4.2M failure, reject the gamble, and pay $2.5M for the guaranteed system.", isCorrect: true }, { text: "Roll the dice on the $2M patch because a 25% chance is the only way to avoid officially reporting the total loss.", isCorrect: false }, { text: "Approve another $4.2M to match the previous spend.", isCorrect: false } ], feedback: "Prospect Theory: humans become risk-seeking to avoid formalizing a sure loss. The $4.2M is Sunk; mathematically, the $2.5M guarantee is vastly superior." },
+            { title: "Underwriting Risk", icon: "📋", situation: "45yo applicant: BMI 31, 80-hour weeks, just bought a Porsche. Algorithm says 4% fatal heart attack risk. Estimate probability of heart attack AND high-speed car crash.", choices: [ { text: "Assign a probability strictly lower than 4%, overriding the desire to merge narratives.", isCorrect: true }, { text: "Assign 6-8%, because the severe risks and red Porsche make the dual-scenario highly plausible.", isCorrect: false }, { text: "Average the risks to create a blended 10% premium.", isCorrect: false } ], feedback: "Conjunction Fallacy: Adding a specific condition (car crash) to a baseline event strictly decreases the mathematical probability, despite plausibility." },
+            { title: "VC / WYSIATI", icon: "💡", situation: "Evaluating a startup. Founder has a Stanford degree, 50k users, and projects $50M. Industry data shows 90% bankruptcy within 24 months in this niche.", choices: [ { text: "Severely penalize the valuation based heavily on the 90% failure rate, treating current metrics as statistically weak.", isCorrect: true }, { text: "Fund full valuation because vivid evidence (50k users) overrides generic statistics.", isCorrect: false }, { text: "Take their 50-page mitigation plan as absolute proof they are the exception.", isCorrect: false } ], feedback: "Base-Rate Neglect & WYSIATI: The highly available 'inside view' tricks us into ignoring the statistical base rate, which is the reliable predictor." },
+            { title: "Executive Salary", icon: "💼", situation: "Negotiating a VP role (target $180k). Recruiter laughs: 'Our last candidate asked for $250k, which is absurd and way outside our $140k budget.'", choices: [ { text: "Completely ignore both $250k and $140k, pause, and confidently demand your objectively calculated $180k.", isCorrect: true }, { text: "Ask for $160k, feeling strategic by splitting the difference.", isCorrect: false }, { text: "Demand $200k, subconsciously dragged upward by the $250k anchor.", isCorrect: false } ], feedback: "Anchoring: Even obviously absurd numbers unconsciously pull your estimates toward them. Deliberately retrieve arguments against the anchor to neutralize it." },
+            { title: "Performance Rebound", icon: "📈", situation: "Team hit 62% of quota. You flew in, fired two people, yelled, and mandated daily reporting. In Q2, sales rebounded to 94%. Does the system work?", choices: [ { text: "Admit to the CEO that the Q2 improvement is almost certainly statistical noise.", isCorrect: true }, { text: "Take full credit, pointing to your aggressive intervention as the causal factor.", isCorrect: false }, { text: "Advise the CEO to implement this 'fear-based' style company-wide.", isCorrect: false } ], feedback: "Regression to the Mean: Extreme performance is statistically followed by performance closer to average. We erroneously assign causal explanations to statistical noise." },
+            { title: "Procurement", icon: "🛍️", situation: "Supplier A: bags for $20k + $1,500 shipping. Supplier B: inferior bags for $23k + 'FREE Shipping'. Budget is $25k.", choices: [ { text: "Endure the annoyance of paying a shipping fee, choose Supplier A, securing better bags for $21.5k total.", isCorrect: true }, { text: "Choose Supplier B for 'FREE' shipping because eliminating the fee feels like a victory.", isCorrect: false }, { text: "Spend 4 hours aggressively negotiating Supplier A's shipping fee.", isCorrect: false } ], feedback: "Zero Price Effect: The word 'FREE!' short-circuits rational analysis, causing you to overpay $1,500 for an inferior product." },
+            { title: "Startup Engineering", icon: "⚙️", situation: "Need 5 exhausted $150k/yr engineers to work a 16-hour weekend. You have a $3k emergency budget.", choices: [ { text: "Order high-end pizzas, stay with them, and passionately appeal to duty and loyalty.", isCorrect: true }, { text: "Offer each a $600 cash bonus to compensate them 'fairly'.", isCorrect: false }, { text: "Create a competitive bounty where the most code wins the entire $3,000.", isCorrect: false } ], feedback: "Introducing small amounts of money shifts from Social Norms to Market Norms. A $600 bonus is insulting compared to their rate; social norms generate far more effort." },
+            { title: "Asset Allocation", icon: "📉", situation: "Bought bio-tech stock for $80k, now worth $45k. You also have $45k in a stable index fund. You need exactly $45k for a house.", choices: [ { text: "Sell the bio-tech stock, officially crystallizing the painful loss, and keep the stable index fund.", isCorrect: true }, { text: "Sell the index fund to protect your 'winning' streak, avoiding a formal loss on the bio-tech stock.", isCorrect: false }, { text: "Wait until the last minute hoping the bio-tech stock rallies slightly to minimize the sting.", isCorrect: false } ], feedback: "Disposition Effect: Investors irrationally hold losing assets to avoid the emotional pain of realizing a loss. Evaluate solely on future utility." },
+            { title: "Public Relations", icon: "📢", situation: "Presenting risk data to hostile town hall. Report A: 'Increases fatality rate by 0.0001%'. Report B: 'Will kill 12 out of 10 million'. They are mathematically identical.", choices: [ { text: "Present Report A (0.0001%), forcing yourself to use the abstract percentage.", isCorrect: true }, { text: "Present Report B because '12 people' sounds like a tiny, manageable number.", isCorrect: false }, { text: "Explain the mathematical equivalence to prove transparency.", isCorrect: false } ], feedback: "Denominator Neglect: We visualize the numerator (12 dead) while ignoring the denominator (10M). Abstract percentages (0.0001%) remain emotionally cold." }
+        ];
+
+        const app = {
+            availableScenarios: [],
+            drillScenarios: [],
+            currentIndex: 0,
+            score: 0,
+            answered: false,
+
+            els: {
+                screenStart: document.getElementById('screen-start'),
+                screenDrill: document.getElementById('screen-drill'),
+                screenEnd: document.getElementById('screen-end'),
+                progressBar: document.getElementById('progress-bar'),
+                progressText: document.getElementById('progress-text'),
+                title: document.getElementById('scenario-title'),
+                icon: document.getElementById('scenario-icon'),
+                text: document.getElementById('scenario-text'),
+                choices: document.getElementById('choices-container'),
+                feedbackContainer: document.getElementById('feedback-container'),
+                feedbackBox: document.getElementById('feedback-box'),
+                feedbackIcon: document.getElementById('feedback-icon'),
+                feedbackHeading: document.getElementById('feedback-heading'),
+                feedbackText: document.getElementById('feedback-text'),
+                finalScore: document.getElementById('final-score')
+            },
+
+            shuffle(array) {
+                let currentIndex = array.length, randomIndex;
+                while (currentIndex != 0) {
+                    randomIndex = Math.floor(Math.random() * currentIndex);
+                    currentIndex--;
+                    [array[currentIndex], array[randomIndex]] = [array[randomIndex], array[currentIndex]];
+                }
+                return array;
+            },
+
+            startDrill() {
+                // Ensure no repeats across replays until all 50 questions are exhausted
+                if (this.availableScenarios.length < 6) {
+                    this.availableScenarios = [...allScenarios]; // Reset queue
+                    this.shuffle(this.availableScenarios);
+                }
+                
+                // Pull 6 unique scenarios from the available queue
+                this.drillScenarios = this.availableScenarios.splice(0, 6);
+                
+                this.currentIndex = 0;
+                this.score = 0;
+                
+                this.els.screenStart.classList.add('hidden');
+                this.els.screenDrill.classList.remove('hidden');
+                this.els.screenDrill.classList.add('flex');
+                
+                this.loadScenario();
+            },
+
+            loadScenario() {
+                this.answered = false;
+                const scenario = this.drillScenarios[this.currentIndex];
+                const shuffledChoices = this.shuffle([...scenario.choices]);
+                
+                this.els.progressText.textContent = `${this.currentIndex + 1} / ${this.drillScenarios.length}`;
+                this.els.progressBar.style.width = `${((this.currentIndex) / this.drillScenarios.length) * 100}%`;
+                this.els.title.textContent = scenario.title;
+                this.els.icon.textContent = scenario.icon;
+                this.els.text.textContent = scenario.situation;
+                
+                this.els.feedbackContainer.classList.add('hidden');
+                this.els.feedbackContainer.classList.remove('fade-in');
+                
+                this.els.choices.innerHTML = '';
+                shuffledChoices.forEach((choice, index) => {
+                    const btn = document.createElement('button');
+                    btn.className = 'choice-btn w-full text-left p-5 rounded-2xl border-2 border-slate-200 bg-white hover:border-indigo-400 hover:bg-indigo-50 text-slate-700 font-medium leading-snug shadow-sm';
+                    btn.innerHTML = `<span class="mr-3 text-slate-400 font-bold">${['A', 'B', 'C'][index]}</span> ${choice.text}`;
+                    btn.onclick = () => this.handleChoice(btn, choice.isCorrect, scenario.feedback, shuffledChoices);
+                    this.els.choices.appendChild(btn);
+                });
+            },
+
+            handleChoice(selectedBtn, isCorrect, feedbackStr, allChoices) {
+                if (this.answered) return;
+                this.answered = true;
+
+                this.els.progressBar.style.width = `${((this.currentIndex + 1) / this.drillScenarios.length) * 100}%`;
+                if (isCorrect) this.score++;
+
+                const buttons = this.els.choices.querySelectorAll('button');
+                buttons.forEach((btn, idx) => {
+                    btn.disabled = true;
+                    btn.classList.remove('hover:border-indigo-400', 'hover:bg-indigo-50', 'shadow-sm');
+                    
+                    if (allChoices[idx].isCorrect) {
+                        btn.classList.add('border-emerald-500', 'bg-emerald-50', 'text-emerald-900');
+                    } else if (btn === selectedBtn && !isCorrect) {
+                        btn.classList.add('border-rose-400', 'bg-rose-50', 'text-rose-900');
+                    } else {
+                        btn.classList.add('opacity-40');
+                    }
+                });
+
+                this.els.feedbackBox.className = `p-5 rounded-2xl mb-6 border ${isCorrect ? 'bg-emerald-50 border-emerald-200 text-emerald-900' : 'bg-rose-50 border-rose-200 text-rose-900'}`;
+                this.els.feedbackIcon.textContent = isCorrect ? '🎯' : '🪤';
+                this.els.feedbackHeading.textContent = isCorrect ? 'Brilliant Call.' : 'You hit a trap.';
+                this.els.feedbackText.textContent = feedbackStr;
+                
+                this.els.feedbackContainer.classList.remove('hidden');
+                this.els.feedbackContainer.classList.add('fade-in');
+            },
+
+            nextScenario() {
+                this.currentIndex++;
+                if (this.currentIndex >= this.drillScenarios.length) {
+                    this.endDrill();
+                } else {
+                    this.loadScenario();
+                }
+            },
+
+            endDrill() {
+                this.els.screenDrill.classList.add('hidden');
+                this.els.screenDrill.classList.remove('flex');
+                this.els.screenEnd.classList.remove('hidden');
+                this.els.screenEnd.classList.add('flex');
+
+                let message = "";
+                if (this.score === 6) message = "Flawless! Your inner thinker is fully awake.";
+                else if (this.score >= 4) message = "Great job! You're catching the autopilot in the act.";
+                else message = "Good effort! Breaking biases takes practice.";
+
+                this.els.finalScore.textContent = `You scored ${this.score} out of 6. ${message}`;
+            },
+
+            restartDrill() {
+                this.els.screenEnd.classList.add('hidden');
+                this.els.screenEnd.classList.remove('flex');
+                this.startDrill();
+            }
+        };
+
+        // Initialize state on load
+        app.availableScenarios = [...allScenarios];
+        app.shuffle(app.availableScenarios);
+
+    </script>
+</body>
+</html>
