@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spot the Fallacy: The Persuasion Masterclass</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        body { font-family: 'Inter', sans-serif; transition: background-color 0.5s ease; }
+        .glass-card { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); }
+        .fade-in { animation: fadeIn 0.4s ease-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .choice-btn:hover:not(:disabled) { transform: translateX(4px); }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-900 min-h-screen">
+
+    <div id="app" class="max-w-2xl mx-auto px-4 sm:px-8 py-8 sm:py-12 min-h-screen flex flex-col">
+        <div id="header-ui" class="hidden mb-8 flex justify-between items-center bg-white p-4 rounded-2xl shadow-sm border border-slate-100">
+            <span class="whitespace-nowrap text-xs sm:text-sm font-semibold text-slate-500 uppercase tracking-wider" id="scenario-counter">Scenario 1/8</span>
+            <div class="flex items-center gap-2">
+                <span class="whitespace-nowrap text-xs sm:text-sm font-bold text-indigo-600" id="score-display">Score: 0</span>
+            </div>
+        </div>
+
+        <main id="content" class="flex-grow flex flex-col justify-center">
+            </main>
+    </div>
+
+    <script>
+        const scenariosRaw = [
+            {
+                category: "Workplace",
+                situation: "Your department is over budget, and the VP issues an ultimatum: 'We either cut the marketing budget by 20% right now, or we lay off three junior team members. Which is it?'",
+                correct: "Reject the premise, calmly stating that other options exist, and propose a brainstorming session on alternative cost-saving measures.",
+                trap1: "Act like a compassionate leader and immediately choose the budget cut to save your team's jobs.",
+                trap2: "Tell the VP that her aggressive management style is destroying company morale.",
+                feedback: "The VP is using a 'False Dilemma,' a fallacy that forces your hand by presenting only two extreme categories. You must reject the framing to discover the real solutions."
+            },
+            {
+                category: "Sales / Persuasion",
+                situation: "You are pitching a new workflow software to a manager, but she interrupts: 'Our current system is fine, and your tool costs way too much money.'",
+                correct: "Agree that it is an investment, but immediately pivot to showing how the software will save her team ten hours a week, removing their biggest daily headache.",
+                trap1: "Pull out a detailed, line-by-line spreadsheet proving your software is actually 5% cheaper over a three-year period.",
+                trap2: "Warn her that her current system is outdated and she will be left behind by the competition.",
+                feedback: "Proving her mathematically wrong makes her defensive. Conceding the cost but pivoting to her team's future benefit wins her over without a fight."
+            },
+            {
+                category: "Talent & Innovation",
+                situation: "A 22-year-old junior intern, who was famously fired from a rival firm, proves a supply chain tweak that will save $42,000 a month. The VP says to bin it because 'that kid comes from a toxic culture and doesn't respect our process.'",
+                correct: "Implement the tweak based entirely on its mathematical merits, completely ignoring the Senior VP's warnings about the intern's history.",
+                trap1: "Bin the idea quietly; maintaining a strong, harmonious relationship with the Senior VP is far more valuable.",
+                trap2: "Publicly confront the Senior VP in a department meeting about their obvious prejudice.",
+                feedback: "The VP commits the 'Genetic Fallacy,' devaluing an idea solely because of its origins. Rejecting good math based on the author's background actively harms the team."
+            },
+            {
+                category: "Marketing Analytics",
+                situation: "Sales spiked 400% after a celebrity accidentally tweeted about your brand. Your marketing agency (who launched an ad campaign the same week) demands a performance bonus.",
+                correct: "Deny the bonus based on the Friday sales spike, requiring them to provide isolated tracking data that proves their specific ads drove the conversions.",
+                trap1: "Pay the bonus; the sheer volume of sales covers their fee 10x over, and keeping vendors motivated is Business 101.",
+                trap2: "Fire the marketing agency immediately for attempting to unethically steal credit from the celebrity's post.",
+                feedback: "This is the 'Chanticleer fallacy' (Post hoc), assuming that because the sales spike followed their campaign, their campaign caused it. Correlation is not causation."
+            },
+            {
+                category: "Relationships",
+                situation: "You ask your partner to stop leaving dirty dishes in the sink. They reply, 'Are you kidding? You leave your shoes in the hallway every single day!'",
+                correct: "Calmly agree that you do leave your shoes out and promise to stop, then steer the conversation back to how you will both handle the dishes.",
+                trap1: "Explain that leaving shoes in the hall doesn't attract bugs, so the dishes are a much more critical household issue.",
+                trap2: "Apologize profusely for the shoes and quietly wash the dishes yourself to avoid ruining the evening.",
+                feedback: "Your partner is using an 'Appeal to Hypocrisy' (Tu Quoque) to divert attention. Conceding the distraction disarms it instantly, allowing a pivot back to future choices."
+            },
+            {
+                category: "Crisis Management",
+                situation: "A major client is furious because your department missed a shipping deadline, and they are aggressively demanding to know exactly who screwed up.",
+                correct: "Say, 'The shipping deadline was missed, and here is exactly what is being done to fix it right now.'",
+                trap1: "Take extreme ownership as the leader, admit it was entirely your fault, and promise it will never happen again.",
+                trap2: "Outline the valid, unavoidable logistical supply-chain issues that caused the delay.",
+                feedback: "The passive voice ('was missed') removes the 'actor' from the equation. Taking blame sounds noble but keeps the client stuck in angry forensic punishment mode."
+            },
+            {
+                category: "Project Management",
+                situation: "You've spent $450k on buggy custom software. A vendor says for $120k more they can fix it, but a competitor offers a ready-made, bug-free system today for $200k.",
+                correct: "Abandon the custom software completely, eat the $450,000 loss, and purchase the competitor’s off-the-shelf system for $200,000.",
+                trap1: "Authorize the $120,000 fix; walking away from a $450,000 investment is financially disastrous.",
+                trap2: "Refuse to spend another dime on either system, forcing your team to manually work around the bugs to save budget.",
+                feedback: "This is the 'Sunk Cost' fallacy. The initial $450k is gone; you must evaluate choices strictly on future advantages, not past investments."
+            },
+            {
+                category: "Office Politics",
+                situation: "You suggest remote work one day a week. A colleague argues, 'If we let everyone stay home in their pajamas every single day, company culture will collapse.'",
+                correct: "Ignore the exaggeration, gently point out you are proposing one single day, and return to the specific productivity benefits.",
+                trap1: "Cite recent Harvard studies proving that remote workers are actually more productive in pajamas than in a cubicle.",
+                trap2: "Accuse your colleague of being an outdated micromanager who refuses to adapt.",
+                feedback: "Your colleague built a 'Straw Man,' caricaturing your argument to make it easier to attack. Defending the exaggerated version (pajamas) validates the trap."
+            }
+        ];
+
+        let scenarios = [];
+        let currentIndex = 0;
+        let score = 0;
+        let state = 'START'; // START, DRILL, END
+
+        const contentEl = document.getElementById('content');
+        const headerEl = document.getElementById('header-ui');
+        const counterEl = document.getElementById('scenario-counter');
+        const scoreEl = document.getElementById('score-display');
+
+        function shuffle(array) {
+            return array.sort(() => Math.random() - 0.5);
+        }
+
+        function initApp() {
+            scenarios = shuffle([...scenariosRaw]).slice(0, 8);
+            render();
+        }
+
+        function render() {
+            contentEl.innerHTML = '';
+            
+            if (state === 'START') {
+                headerEl.classList.add('hidden');
+                contentEl.innerHTML = `
+                    <div class="fade-in text-center space-y-6">
+                        <div class="inline-flex p-4 bg-indigo-100 text-indigo-600 rounded-3xl mb-4">
+                            <i data-lucide="shield-check" class="w-12 h-12"></i>
+                        </div>
+                        <h1 class="text-4xl font-bold text-slate-900 tracking-tight">Spot the Fallacy</h1>
+                        <p class="text-lg text-slate-600 font-medium leading-relaxed">
+                            Mastering the hidden mechanics of persuasion acts like a superpower, letting you spot manipulation and flip the script in your favor.
+                        </p>
+                        <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-100 text-left">
+                            <h3 class="font-bold text-slate-800 mb-2 flex items-center gap-2">
+                                <i data-lucide="brain-circuit" class="w-5 h-5 text-indigo-500"></i> The Mental Model
+                            </h3>
+                            <p class="text-slate-600 text-sm leading-relaxed">
+                                True rhetorical masters don't just win debates with facts; they control the structure of the argument. You'll learn to identify hidden biases, use the correct tense, and shift focus toward a shared, advantageous future.
+                            </p>
+                        </div>
+                        <button onclick="startDrill()" class="w-full py-4 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-2xl shadow-lg shadow-indigo-200 transition-all transform active:scale-95">
+                            Start the Masterclass
+                        </button>
+                    </div>
+                `;
+            } else if (state === 'DRILL') {
+                headerEl.classList.remove('hidden');
+                const s = scenarios[currentIndex];
+                counterEl.innerText = `Scenario ${currentIndex + 1}/${scenarios.length}`;
+                scoreEl.innerText = `Score: ${score}`;
+
+                const choices = shuffle([
+                    { text: s.correct, type: 'correct' },
+                    { text: s.trap1, type: 'trap' },
+                    { text: s.trap2, type: 'trap' }
+                ]);
+
+                contentEl.innerHTML = `
+                    <div class="fade-in space-y-6">
+                        <div class="space-y-2">
+                            <span class="px-3 py-1 bg-indigo-50 text-indigo-600 text-xs font-bold rounded-full uppercase tracking-widest">${s.category}</span>
+                            <h2 class="text-xl sm:text-2xl font-bold text-slate-800 leading-tight">${s.situation}</h2>
+                        </div>
+                        
+                        <div class="space-y-3" id="choices-container">
+                            ${choices.map((c, i) => `
+                                <button onclick="handleChoice('${c.type}', this)" class="choice-btn w-full p-4 text-left bg-white border-2 border-slate-100 rounded-2xl hover:border-indigo-200 hover:bg-indigo-50 transition-all flex items-start gap-4 group">
+                                    <span class="flex-shrink-0 w-6 h-6 rounded-full border border-slate-300 group-hover:border-indigo-400 flex items-center justify-center text-xs font-bold">${String.fromCharCode(65 + i)}</span>
+                                    <span class="text-slate-700 font-medium">${c.text}</span>
+                                </button>
+                            `).join('')}
+                        </div>
+
+                        <div id="feedback-area" class="hidden animate-in slide-in-from-bottom-4 duration-300">
+                            <div id="feedback-box" class="p-6 rounded-3xl border-2 mb-4">
+                                <div class="flex items-center gap-3 mb-2">
+                                    <div id="feedback-icon" class="rounded-full p-1"></div>
+                                    <h4 id="feedback-title" class="font-bold uppercase tracking-wide"></h4>
+                                </div>
+                                <p id="feedback-text" class="text-slate-600 leading-relaxed"></p>
+                            </div>
+                            <button onclick="nextScenario()" class="w-full py-4 bg-slate-900 text-white font-bold rounded-2xl shadow-xl flex items-center justify-center gap-2">
+                                Next Scenario <i data-lucide="arrow-right" class="w-5 h-5"></i>
+                            </button>
+                        </div>
+                    </div>
+                `;
+            } else if (state === 'END') {
+                headerEl.classList.add('hidden');
+                const performance = score >= 7 ? "Rhetorical Master" : score >= 5 ? "Persuasive Pro" : "Skill Builder";
+                contentEl.innerHTML = `
+                    <div class="fade-in text-center space-y-8">
+                        <div>
+                            <h1 class="text-5xl font-black text-indigo-600 mb-2">${score}/${scenarios.length}</h1>
+                            <p class="text-xl font-bold text-slate-800">Rank: ${performance}!</p>
+                            <p class="text-slate-500">You've mastered the art of spotting manipulation.</p>
+                        </div>
+
+                        <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-100 text-left space-y-4">
+                            <h3 class="font-bold text-slate-800 flex items-center gap-2">
+                                <i data-lucide="book-open" class="w-5 h-5 text-emerald-500"></i> Persuasion Cheat Sheet
+                            </h3>
+                            <ul class="space-y-4">
+                                <li class="flex gap-3">
+                                    <div class="w-6 h-6 bg-emerald-100 text-emerald-600 rounded-full flex-shrink-0 flex items-center justify-center text-xs font-bold">1</div>
+                                    <p class="text-sm text-slate-600"><strong>Agree to Win:</strong> Use tactical concession to disarm anger, then pivot to future choices.</p>
+                                </li>
+                                <li class="flex gap-3">
+                                    <div class="w-6 h-6 bg-emerald-100 text-emerald-600 rounded-full flex-shrink-0 flex items-center justify-center text-xs font-bold">2</div>
+                                    <p class="text-sm text-slate-600"><strong>Passive Voice Power:</strong> Use it to diffuse blame ("Mistakes were made") and force focus on solutions.</p>
+                                </li>
+                                <li class="flex gap-3">
+                                    <div class="w-6 h-6 bg-emerald-100 text-emerald-600 rounded-full flex-shrink-0 flex items-center justify-center text-xs font-bold">3</div>
+                                    <p class="text-sm text-slate-600"><strong>Target the Core:</strong> Ignore insults, typos, and tone. Refute the central claim directly to win.</p>
+                                </li>
+                            </ul>
+                        </div>
+
+                        <button onclick="restart()" class="w-full py-4 bg-indigo-600 text-white font-bold rounded-2xl shadow-lg hover:bg-indigo-700 transition-all">
+                            Try Again
+                        </button>
+                    </div>
+                `;
+            }
+            lucide.createIcons();
+        }
+
+        function startDrill() {
+            state = 'DRILL';
+            render();
+        }
+
+        function handleChoice(type, btn) {
+            const isCorrect = type === 'correct';
+            if (isCorrect) score++;
+
+            // Disable all buttons
+            const btns = document.querySelectorAll('.choice-btn');
+            btns.forEach(b => b.disabled = true);
+
+            // Style choice
+            btn.classList.remove('border-slate-100');
+            btn.classList.add(isCorrect ? 'border-emerald-500' : 'border-rose-500');
+            btn.classList.add(isCorrect ? 'bg-emerald-50' : 'bg-rose-50');
+
+            // Show feedback
+            const feedbackArea = document.getElementById('feedback-area');
+            const feedbackBox = document.getElementById('feedback-box');
+            const feedbackIcon = document.getElementById('feedback-icon');
+            const feedbackTitle = document.getElementById('feedback-title');
+            const feedbackText = document.getElementById('feedback-text');
+
+            feedbackArea.classList.remove('hidden');
+            feedbackText.innerText = scenarios[currentIndex].feedback;
+            
+            if (isCorrect) {
+                feedbackBox.classList.add('bg-emerald-50', 'border-emerald-100');
+                feedbackTitle.innerText = "Correct Move";
+                feedbackTitle.classList.add('text-emerald-700');
+                feedbackIcon.innerHTML = '<i data-lucide="check" class="w-5 h-5 text-white"></i>';
+                feedbackIcon.classList.add('bg-emerald-500');
+            } else {
+                feedbackBox.classList.add('bg-rose-50', 'border-rose-100');
+                feedbackTitle.innerText = "You Fell for the Trap";
+                feedbackTitle.classList.add('text-rose-700');
+                feedbackIcon.innerHTML = '<i data-lucide="x" class="w-5 h-5 text-white"></i>';
+                feedbackIcon.classList.add('bg-rose-500');
+            }
+            lucide.createIcons();
+        }
+
+        function nextScenario() {
+            if (currentIndex < scenarios.length - 1) {
+                currentIndex++;
+                render();
+            } else {
+                state = 'END';
+                render();
+            }
+        }
+
+        function restart() {
+            currentIndex = 0;
+            score = 0;
+            state = 'START';
+            initApp();
+        }
+
+        initApp();
+    </script>
+</body>
+</html>
