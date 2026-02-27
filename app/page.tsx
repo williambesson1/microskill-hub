@@ -175,6 +175,18 @@ export default function Home() {
     }
   };
 
+  const getCardBackground = (category: string) => {
+    switch (category?.toLowerCase()) {
+      case 'clear thinking & logic': return 'bg-gradient-to-br from-indigo-50/90 via-white/90 to-white/80';
+      case 'people & communication': return 'bg-gradient-to-br from-emerald-50/90 via-white/90 to-white/80';
+      case 'digital survival & media': return 'bg-gradient-to-br from-blue-50/90 via-white/90 to-white/80';
+      case 'mind & resilience': return 'bg-gradient-to-br from-rose-50/90 via-white/90 to-white/80';
+      case 'time & action': return 'bg-gradient-to-br from-amber-50/90 via-white/90 to-white/80';
+      case 'real-world math & money': return 'bg-gradient-to-br from-teal-50/90 via-white/90 to-white/80';
+      default: return 'bg-gradient-to-br from-slate-50/90 via-white/90 to-white/80';
+    }
+  };
+
   return (
     <div className="min-h-screen font-sans relative">
       
@@ -325,7 +337,7 @@ export default function Home() {
                       <Link 
                         key={skill.id} 
                         href={`/drills/${skill.slug}`} 
-                        className="min-w-[240px] max-w-[240px] snap-start bg-white/90 backdrop-blur-lg border border-slate-200/50 rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all flex flex-col"
+                        className={`min-w-[240px] max-w-[240px] snap-start backdrop-blur-lg border border-slate-200/50 rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all flex flex-col ${getCardBackground(skill.category)}`}
                       >
                         <div className={`h-1 w-full shrink-0 ${lineClass}`}></div>
                         <div className="p-5 flex flex-col flex-grow">
