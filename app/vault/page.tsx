@@ -138,7 +138,8 @@ export default function Dashboard() {
             <Link href="/" className="flex items-center gap-2">
                 
                 {/* THE NEW SKILL PRISM LOGO */}
-                <div className="w-8 h-8 sm:w-10 sm:h-10 shrink-0 shadow-lg rounded-lg bg-white dark:bg-slate-900 flex items-center justify-center p-1.5 border border-slate-200/50 dark:border-slate-700/50">
+                <Link href="/" className="flex items-center gap-2">
+                <div className="w-8 h-8 sm:w-10 sm:h-10 shrink-0 shadow-lg rounded-lg bg-white flex items-center justify-center p-1.5 border border-slate-200/50">
                   <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-full drop-shadow-md">
                     <defs>
                       <linearGradient id="indigoGrad" x1="0" y1="0" x2="1" y2="1">
@@ -161,6 +162,9 @@ export default function Dashboard() {
                     <path d="M15 45 L25 80 L50 45 Z" fill="black" fillOpacity="0.1" />
                   </svg>
                 </div>
+                {/* Forced text-slate-900 so the text never turns white on mobile */}
+                <span className="font-black uppercase tracking-tighter text-sm sm:text-base hidden sm:inline-block text-slate-900">Skealed</span>
+            </Link>
 
                 <span className="font-black uppercase tracking-tighter text-sm sm:text-base hidden sm:inline-block">Skealed</span>
             </Link>
