@@ -5,7 +5,7 @@ import Link from 'next/link';
 // We added Brain and LogOut to match the homepage navigation
 import { ArrowLeft, ArrowUp, ArrowDown, Lightbulb, Plus, MessageSquare, Trash2, Brain, LogOut } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
-import ThemeToggle from '../../components/ThemeToggle';
+
 
 export default function IdeasBoard() {
   const [ideas, setIdeas] = useState<any[]>([]);
@@ -173,7 +173,6 @@ export default function IdeasBoard() {
               <span className="font-black uppercase tracking-tighter text-sm sm:text-base">Skealed</span>
           </Link>
           <div className="flex items-center gap-4">
-              <ThemeToggle />
               {user ? (
                   <button onClick={() => supabase.auth.signOut()} className="text-slate-500 hover:text-rose-500 transition-colors"><LogOut size={20}/></button>
               ) : <Link href="/login" className="text-sm font-bold opacity-70 hover:opacity-100">SIGN IN</Link>}

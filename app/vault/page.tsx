@@ -9,7 +9,7 @@ import {
   Users, Activity, Target, PieChart
 } from 'lucide-react';
 import { supabase } from '../../lib/supabase'; 
-import ThemeToggle from '../../components/ThemeToggle';
+
 
 export default function Dashboard() {
   const [user, setUser] = useState<any>(null);
@@ -169,7 +169,6 @@ export default function Dashboard() {
               <Link href="/ideas" className="hidden sm:flex items-center gap-1.5 text-xs font-bold text-slate-500 hover:text-amber-500 transition-colors uppercase tracking-widest">
              <Lightbulb size={14} /> Suggest Skill
              </Link>
-              <ThemeToggle />
               <button onClick={handleSignOut} className="text-slate-500 hover:text-rose-500 transition-colors p-1"><LogOut size={18} className="sm:w-[20px] sm:h-[20px]"/></button>
           </div>
         </nav>

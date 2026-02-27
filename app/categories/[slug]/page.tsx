@@ -25,7 +25,7 @@ import {
   PieChart
 } from 'lucide-react';
 import { supabase } from '../../../lib/supabase'; 
-import ThemeToggle from '../../../components/ThemeToggle'; 
+
 
 type SortType = 'top' | 'new' | 'saved';
 
@@ -241,7 +241,6 @@ const categoryTitle = CATEGORY_MAP[rawSlug] || rawSlug.replace(/-/g, ' ').replac
               <Link href="/ideas" className="hidden sm:flex items-center gap-1.5 text-xs font-bold text-slate-500 hover:text-amber-500 transition-colors uppercase tracking-widest">
              <Lightbulb size={14} /> Suggest Skill
              </Link>
-              <ThemeToggle />
               {user ? (
                   <button onClick={() => supabase.auth.signOut()} className="text-slate-500 hover:text-rose-500 transition-colors p-1"><LogOut size={18} className="sm:w-[20px] sm:h-[20px]"/></button>
               ) : <Link href="/login" className="text-xs sm:text-sm font-bold opacity-70 hover:opacity-100 whitespace-nowrap">SIGN IN</Link>}
