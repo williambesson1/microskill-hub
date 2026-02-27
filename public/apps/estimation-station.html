@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Estimation Station | Masterclass</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; }
+        .soft-shadow { box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.05), 0 10px 10px -5px rgba(0, 0, 0, 0.02); }
+        .choice-btn { transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); }
+        .fade-in { animation: fadeIn 0.4s ease-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .progress-bar { transition: width 0.4s ease-in-out; }
+    </style>
+</head>
+<body class="min-h-screen text-slate-800">
+
+    <div id="app" class="max-w-2xl mx-auto min-h-screen flex flex-col justify-center px-4 sm:px-8 py-8">
+        </div>
+
+    <script>
+        const allScenarios = [
+            // BASIC / EVERYDAY
+            { title: "Market Sizing", situation: "Your boss asks you to size the market for piano tuners in Chicago, but there's no data available yet.", correct: "Break the city population into households, guess piano ownership %, and estimate tuner capacity.", trap1: "Spend $10,000 and three months on a high-precision market research report.", trap2: "Blindly guess that since Chicago is huge, there must be tens of thousands.", feedback: "Breaking problems down gets you 'approximately right' in minutes—perfect for go/no-go decisions." },
+            { title: "Hidden Fuel Costs", situation: "You're deciding if an expensive gas-sipper is worth it. How do you estimate lifetime fuel costs?", correct: "Round total miles (100k), divide by rounded MPG (20), and multiply by gas price.", trap1: "Use a calculator for exact odometer readings to 8 decimal places.", trap2: "Assume fuel costs are a tiny drop in the bucket compared to the sticker price.", feedback: "Rounding to one significant figure keeps you focused on the big picture: fuel costs often equal the car's price." },
+            { title: "Library Crisis", situation: "2 million books fell in an earthquake. You need to hire temp workers to reshelve them in 3 weeks.", correct: "Estimate a rate (e.g., 200 books/hr/worker) and solve for the number of people.", trap1: "Track the exact time it takes to put one specific book away to build a complex model.", trap2: "Panic at the '2 million' and hire anyone with a pulse until the budget evaporates.", feedback: "Establishing a simple rate turns a chaotic disaster into a solvable equation." },
+            { title: "Political Pitch", situation: "A politician claims we can replace all fossil jet fuel with bio-jet fuel from crops easily. Is it true?", correct: "Estimate global jet fuel demand vs. total world biomass yield of major crops.", trap1: "Support it because the 'green energy' narrative sounds appealing.", trap2: "Assume the politician is lying simply because you dislike their party.", feedback: "Quick math reveals that replacing all jet fuel would require more crops than the world actually produces." },
+            { title: "Rally Logistics", situation: "You're organizing a rally for 1,000,000 people. How many portable toilets do you rent?", correct: "Estimate time spent in bathroom (1% of day) and rent 1 toilet per 100 people.", trap1: "Just guess a random number midway between 1 and 1,000,000.", trap2: "Refuse to sign the contract until you find a definitive study on crowd bladder habits.", feedback: "Pick upper/lower bounds (1 min vs 100 min) and take the geometric mean (10 min) for a safe baseline." },
+            { title: "Shark Fear", situation: "Terrified of sharks, you drive 10 extra hours to a lake instead of the beach. Is this safer?", correct: "Compare shark deaths per year (~1) to the risk of death per mile driven.", trap1: "Let the vivid news narrative override the statistical probability of the threat.", trap2: "Look up exact decimal-point shark statistics for that specific beach over a decade.", feedback: "Driving is ~100x more dangerous than sharks. Rough numbers protect you from fear manipulation." },
+            
+            // EXPERT / COGNITIVE BIAS
+            { title: "The $50B Bio-Jet Pitch", situation: "A $50B fund wants you to greenlight a bio-jet fuel project immediately. Lobbyists promise it's ready.", correct: "Compare required biomass to global food yields—it would consume all global maize/wheat/rice.", trap1: "Approve it, anchored by the $50B budget and the $5M already spent on lobbying.", trap2: "Demand a 8-month study on enzymatic efficiency to the 4th decimal place.", feedback: "The traps anchor you to money or precision. The Fermi check reveals hard biophysical limits." },
+            { title: "The $15k Raise Illusion", situation: "Boss offers a $15k raise for a 60-mile daily commute. He says it's just '1 hour at 60 mph'.", correct: "Add time spent earning the $60k car cost to driving time; true speed is closer to 20 mph.", trap1: "Accept immediately, anchored by the $15k reward and the 60 mph speed limit.", trap2: "Build a spreadsheet tracking exact gas prices and stoplight delays.", feedback: "System 1 ignores 'hidden' working hours. Calculating total cost of ownership shatters the illusion." },
+            { title: "Landfill Panic", situation: "News claims we generate 300 million cubic meters of trash yearly and will be 'buried in garbage'.", correct: "Estimate land area for 100 years of trash; it occupies less than 0.01% of US land.", trap1: "Authorize a $2B emergency mandate, swept up by the terrifying news imagery.", trap2: "Assume the statistic is a complete lie fabricated by the media.", feedback: "Vivid imagery overwhelms logic. Converting 3D volume to a 2D land fraction proves we have space." },
+            { title: "The 3D Tree House", situation: "Architect wants $20M for 'living buildings' grown from fused trees to solve housing in a decade.", correct: "Estimate wood volume vs. tree growth rates; it would take 200-300 years per house.", trap1: "Invest because the 3D renderings trigger the 'Halo Effect' of green solutions.", trap2: "Demand precise genetic sequences and leaf-surface-area ratios for a MM-perfect model.", feedback: "Don't fall for the aesthetic 'halo.' Tree physiology cannot be rushed by a venture check." },
+            { title: "Sunk Cost Tuners", situation: "Marketing spent $150k on a tuner survey. The database crashed. They need $50k to recover it.", correct: "Deny funding; spend 2 mins estimating Chicago's tuners (around 100) for free.", trap1: "Approve the $50k because you've already 'invested' $150k.", trap2: "Freeze the app launch until you can identify the exact number of tuners.", feedback: "Sunk costs make us throw good money after bad. A Fermi estimate provides a 'good enough' answer." },
+            { title: "The $850M Lottery", situation: "A relative wants $5,000 for lottery tickets, claiming 5,000 tickets 'dramatically shifts' the odds.", correct: "Calculate ticket stack height (100M tickets = 20km high) to show 5,000 tickets is a tiny slice.", trap1: "Lend the money, seduced by the $850M anchor and the Gambler's Fallacy.", trap2: "Spend hours calculating exact probability to 12 decimals to prove them wrong.", feedback: "Abstract odds are hard to grasp. Translating them into physical distance creates a visceral argument." },
+            { title: "10M Stranded Flyers", situation: "Coordinator screams about 10 million airborne passengers stranded by a radar outage.", correct: "Estimate avg. time a person flies vs. total hours in a year; only ~300k are airborne.", trap1: "Mobilize for 10M because Authority Bias anchors you to the official's number.", trap2: "Assume everyone is flying because airports look crowded on TV (Availability Heuristic).", feedback: "Panic anchors us to worst-case numbers. Individual time fractions help you bound the population." },
+            { title: "Spider-Man's Catch", situation: "Director wants to spend $2M to make a human 'realistically' brace against a runaway subway train.", correct: "Calculate kinetic energy; the force is thousands of tons and biologically impossible.", trap1: "Cave to the director due to conflict avoidance, assuming 'movie physics' is fine.", trap2: "Assume that because humans can push a 1-ton car, they can scale up to a train.", feedback: "Don't let social pressure override physics. 10,000 tons of force is objectively unsurvivable." },
+            { title: "100% Solar Illusion", situation: "A group demands $5 trillion for a solar array they claim will cover half the continent.", correct: "Calculate solar density; it requires 40k km2 (0.4% of US land), not a whole continent.", trap1: "Endorse it because the 'Affect Heuristic' makes you want to be on the green side.", trap2: "Reject it, assuming panels would need to cover all of North America.", feedback: "Emotions cloud judgment of scale. Solar needs land equal to half of all US paved roads." },
+            { title: "Alpha Centauri Con", situation: "Billionaire offers $500k to design a 10,000-ton rocket to reach Alpha Centauri in 40 years.", correct: "Calculate fuel energy needed; the fuel would weigh 100M times more than the ship.", trap1: "Take the job, blinded by Greed and Optimism Bias.", trap2: "Spend months shaving 5% off life-support weight to 'make the math work'.", feedback: "Greed blinds us to physical limits. Chemical fuel is fundamentally incapable of interstellar speed." },
+            
+            // ADDITIONAL SCIENCE & LOGISTICS
+            { title: "The Fertilizer Fix", situation: "Startup claims legume cover crops can replace all global synthetic nitrogen fertilizer.", correct: "Estimate legume nitrogen yield vs. global land; it would require ~100% of all cropland.", trap1: "Reject it entirely, assuming biological nitrogen fixation is a myth.", trap2: "Invest, assuming natural processes can be infinitely scaled without land limits.", feedback: "System 1 assumes 'natural' is 'unlimited.' Math shows land area is the hard constraint." },
+            { title: "Bioplastics Mandate", situation: "Policy wants all plastic made from sugarcane waste (bagasse) to eliminate fossil fuels.", correct: "Estimate global bagasse supply vs. plastic demand; it could only replace ~2%.", trap1: "Support it, assuming huge crops must easily match our plastic consumption.", trap2: "Oppose it because you think bioplastics aren't 'real' and will melt in rain.", feedback: "Huge crops don't equal total replacements. Bioplastics are a supplement, not a total fix." },
+            { title: "Rickshaws vs. Cars", situation: "City council says human-pedaled rickshaws have zero fuel cost compared to taxis.", correct: "Calculate food calorie cost per mile; human 'fuel' is 2-3x more expensive than gas.", trap1: "Agree, because human labor uses 'free' renewable energy.", trap2: "Argue humans are just too slow, missing the hidden economic cost of food-as-fuel.", feedback: "Food is much more expensive per joule than gasoline. Humans are expensive engines." },
+            { title: "Invisible Tire Wear", situation: "Group claims tires shed 'massive, visible chunks' of rubber every single mile.", correct: "Divide tread thickness by lifespan; tires lose only a molecule-thick layer per rotation.", trap1: "Assume highways are coated in thick layers of hidden rubber debris.", trap2: "Argue tires don't lose any rubber until they suddenly go bald at the end.", feedback: "Wear is constant but microscopic. Math protects you from sensationalist exaggerations." },
+            { title: "Speed Limit Tax", situation: "Board wants to drop highway limits from 65 to 55 mph, calling it a 'tiny' difference.", correct: "Multiply lost time by trillions of miles; it costs the US 1 billion hours/year.", trap1: "Support it, feeling that 5 minutes on your personal commute is meaningless.", trap2: "Claim that 55 mph makes people fall asleep, causing more crashes.", feedback: "System 1 minimizes small numbers. Aggregating across 300 million people reveals a massive tax." }
+        ];
+
+        let scenarios = [];
+        let currentIndex = 0;
+        let score = 0;
+        let state = 'START';
+        let selectedIndex = null;
+
+        const app = document.getElementById('app');
+
+        function init() {
+            scenarios = allScenarios.sort(() => Math.random() - 0.5).slice(0, 8);
+            render();
+        }
+
+        function render() {
+            app.innerHTML = '';
+            if (state === 'START') renderStart();
+            else if (state === 'QUIZ') renderQuiz();
+            else if (state === 'END') renderEnd();
+            lucide.createIcons();
+        }
+
+        function renderStart() {
+            app.innerHTML = `
+                <div class="bg-white rounded-3xl p-8 sm:p-12 soft-shadow border border-slate-100 fade-in text-center">
+                    <div class="inline-flex items-center justify-center w-20 h-20 bg-indigo-50 text-indigo-600 rounded-3xl mb-8">
+                        <i data-lucide="calculator" class="w-10 h-10"></i>
+                    </div>
+                    <h1 class="text-3xl sm:text-4xl font-bold text-slate-900 mb-4 tracking-tight">Estimation Station</h1>
+                    <p class="text-lg text-indigo-600 font-medium mb-8">The "Fermi Calculation" Masterclass</p>
+                    
+                    <div class="text-left space-y-5 mb-10">
+                        <div class="flex gap-4">
+                            <div class="flex-shrink-0 w-6 h-6 rounded-full bg-emerald-100 flex items-center justify-center mt-1">
+                                <i data-lucide="check" class="w-4 h-4 text-emerald-600"></i>
+                            </div>
+                            <p class="text-slate-600"><span class="font-bold text-slate-900">The Hook:</span> Mastering guesstimation lets you instantly cut through nonsense and spot strategic disasters before they happen.</p>
+                        </div>
+                        <div class="flex gap-4">
+                            <div class="flex-shrink-0 w-6 h-6 rounded-full bg-indigo-100 flex items-center justify-center mt-1">
+                                <i data-lucide="brain" class="w-4 h-4 text-indigo-600"></i>
+                            </div>
+                            <p class="text-slate-600"><span class="font-bold text-slate-900">The Mental Model:</span> Break big problems into bite-sized pieces. Since overestimates and underestimates balance out, you'll land in the right ballpark.</p>
+                        </div>
+                    </div>
+
+                    <button onclick="state='QUIZ'; render()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-4 px-8 rounded-2xl transition-all shadow-xl shadow-indigo-100 text-lg">
+                        Launch Drill 🚀
+                    </button>
+                </div>
+            `;
+        }
+
+        function renderQuiz() {
+            const s = scenarios[currentIndex];
+            const choices = [
+                { text: s.correct, correct: true },
+                { text: s.trap1, correct: false },
+                { text: s.trap2, correct: false }
+            ].sort(() => Math.random() - 0.5);
+
+            app.innerHTML = `
+                <div class="flex justify-between items-center mb-4 px-2">
+                    <span class="whitespace-nowrap text-xs sm:text-sm font-bold text-slate-400 uppercase tracking-widest">
+                        Case ${currentIndex + 1} of ${scenarios.length}
+                    </span>
+                    <span class="whitespace-nowrap text-xs sm:text-sm font-bold bg-indigo-50 text-indigo-700 px-3 py-1 rounded-lg">
+                        Score: ${score}
+                    </span>
+                </div>
+                
+                <div class="w-full bg-slate-200 h-1.5 rounded-full mb-8 overflow-hidden">
+                    <div class="progress-bar bg-indigo-500 h-full" style="width: ${(currentIndex / scenarios.length) * 100}%"></div>
+                </div>
+
+                <div class="bg-white rounded-3xl p-6 sm:p-10 soft-shadow border border-slate-100 fade-in">
+                    <div class="mb-2 inline-block px-3 py-1 rounded-full bg-slate-100 text-slate-500 text-[10px] font-bold uppercase tracking-tighter">Scenario Context</div>
+                    <h2 class="text-xl sm:text-2xl font-bold text-slate-900 mb-2 leading-tight">${s.title}</h2>
+                    <p class="text-slate-600 mb-10 text-lg leading-relaxed">${s.situation}</p>
+
+                    <div class="space-y-4">
+                        ${choices.map((c, i) => `
+                            <button onclick="checkAnswer(${c.correct}, ${i})" 
+                                ${selectedIndex !== null ? 'disabled' : ''}
+                                class="choice-btn w-full text-left p-5 rounded-2xl border-2 flex items-start gap-4 
+                                ${getBtnClass(c.correct, i)}">
+                                <span class="mt-1 font-bold opacity-30">${String.fromCharCode(65 + i)}</span>
+                                <span class="font-medium">${c.text}</span>
+                            </button>
+                        `).join('')}
+                    </div>
+
+                    ${selectedIndex !== null ? `
+                        <div class="mt-8 p-6 rounded-2xl border-2 fade-in ${choices.find((c, idx) => idx === selectedIndex).correct ? 'bg-emerald-50 border-emerald-100' : 'bg-rose-50 border-rose-100'}">
+                            <p class="text-sm leading-relaxed text-slate-700">
+                                <span class="font-bold block mb-1 ${choices.find((c, idx) => idx === selectedIndex).correct ? 'text-emerald-700' : 'text-rose-700'}">
+                                    ${choices.find((c, idx) => idx === selectedIndex).correct ? 'Correct Insight!' : 'Cognitive Trap!'}
+                                </span>
+                                ${s.feedback}
+                            </p>
+                            <button onclick="next()" class="mt-6 w-full bg-slate-900 text-white font-bold py-4 rounded-xl hover:bg-black transition-all">
+                                Next Scenario
+                            </button>
+                        </div>
+                    ` : ''}
+                </div>
+            `;
+        }
+
+        function getBtnClass(isCorrect, i) {
+            if (selectedIndex === null) return "border-slate-100 hover:border-indigo-200 hover:bg-slate-50 text-slate-700";
+            if (i === selectedIndex) return isCorrect ? "border-emerald-500 bg-emerald-50 text-emerald-900 shadow-md" : "border-rose-500 bg-rose-50 text-rose-900 shadow-md";
+            return isCorrect ? "border-emerald-200 text-emerald-700 opacity-60" : "border-slate-50 opacity-40 text-slate-400";
+        }
+
+        window.checkAnswer = (isCorrect, i) => {
+            selectedIndex = i;
+            if (isCorrect) score++;
+            render();
+        }
+
+        window.next = () => {
+            selectedIndex = null;
+            if (currentIndex < scenarios.length - 1) {
+                currentIndex++;
+                render();
+            } else {
+                state = 'END';
+                render();
+            }
+        }
+
+        function renderEnd() {
+            const perc = (score / scenarios.length) * 100;
+            const rank = perc === 100 ? "Grand Architect" : perc >= 75 ? "Expert Analyst" : "Apprentice Estimator";
+            
+            app.innerHTML = `
+                <div class="bg-white rounded-3xl p-8 sm:p-12 soft-shadow border border-slate-100 fade-in text-center">
+                    <div class="text-6xl mb-4">🏆</div>
+                    <h2 class="text-3xl font-bold text-slate-900 mb-1">Rank: ${rank}</h2>
+                    <p class="text-slate-500 mb-8">You scored ${score} out of ${scenarios.length}</p>
+                    
+                    <div class="bg-indigo-50 rounded-2xl p-6 text-left mb-8 border border-indigo-100">
+                        <h3 class="font-bold text-indigo-900 mb-4 flex items-center gap-2 uppercase text-xs tracking-widest">
+                            Mastery Cheat Sheet
+                        </h3>
+                        <ul class="space-y-4 text-sm text-indigo-900/80">
+                            <li><strong class="text-indigo-900">1. Break It Down:</strong> If an estimate feels impossible, chop it into pieces you <i>can</i> guess.</li>
+                            <li><strong class="text-indigo-900">2. Ditch the Exacts:</strong> Aggressively round to one significant digit. Focus on the number of zeroes.</li>
+                            <li><strong class="text-indigo-900">3. Find the Bounds:</strong> Establish a ridiculous 'too high' and 'too low' number; the truth is always in the middle.</li>
+                        </ul>
+                    </div>
+
+                    <button onclick="restart()" class="w-full bg-slate-900 hover:bg-black text-white font-bold py-4 rounded-2xl transition-all">
+                        Restart Training
+                    </button>
+                </div>
+            `;
+        }
+
+        window.restart = () => {
+            currentIndex = 0;
+            score = 0;
+            state = 'START';
+            selectedIndex = null;
+            init();
+        }
+
+        init();
+    </script>
+</body>
+</html>

@@ -15,7 +15,7 @@ export default function Footer() {
               Skealed
                           </h2>
             <p className="text-sm text-slate-500 leading-relaxed mb-6">
-            A community-driven platform for bite-sized learning. We turn complex digital survival skills into 30-second interactive drills.
+            A community-driven platform for bite-sized learning.
             </p>
             <div className="flex gap-4">
               <Link href="#" className="text-slate-400 hover:text-indigo-500 transition-colors"><Twitter size={20} /></Link>
@@ -27,7 +27,7 @@ export default function Footer() {
           <div>
             <h3 className="font-bold text-sm uppercase tracking-widest mb-6 text-slate-400">Platform</h3>
             <ul className="space-y-4 text-sm font-medium">
-              <li><Link href="/" className="hover:text-indigo-500 transition-colors">Home Hub</Link></li>
+              <li><Link href="/" className="hover:text-indigo-500 transition-colors">Home</Link></li>
               <li><Link href="/vault" className="hover:text-indigo-500 transition-colors">My Dashboard</Link></li>
               <li><Link href="/categories/ai-literacy" className="hover:text-indigo-500 transition-colors">AI Literacy</Link></li>
             </ul>
@@ -64,7 +64,7 @@ export default function Footer() {
         {/* Bottom Bar */}
         <div className="pt-8 border-t border-slate-200/30 dark:border-slate-800/30 flex flex-col md:flex-row justify-between items-center gap-4">
           <p className="text-xs text-slate-400 font-medium">
-            © {currentYear} Paradise Hub. All rights reserved. Built locally in 2026.
+            © {currentYear} Skealed. All rights reserved. Built locally in 2026.
           </p>
           <div className="flex items-center gap-1 text-[10px] text-slate-400 uppercase font-black">
             <span>Status:</span>
