@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>The Scam Sensor</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body { font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; }
+    .fade-in { animation: fadeIn 0.3s ease-in-out; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-900 h-screen w-screen overflow-hidden flex flex-col items-center justify-center p-4 sm:p-8">
+
+  <div id="app" class="w-full h-full max-w-md mx-auto flex flex-col relative fade-in"></div>
+
+  <script>
+    // 1. The Data (From your React screenshot)
+    const scenarios = [
+      { sender: "Apple Support", initial: "A", color: "bg-indigo-600", meta: "security@apple-verify-auth.me", body: "\"Your Apple ID logged in from a new device. Click to lock: bit.ly/id-lock-22\"", isScam: true, feedback: "Look at the email address: 'apple-verify-auth.me' is not a real Apple domain. Real Apple emails end in @apple.com." },
+      { sender: "Chase Bank", initial: "C", color: "bg-blue-600", meta: "alerts@chase.com", body: "\"Debit card ending in 4242 used for $12.50 at 'Coffee 2026'. Respond NO if unauthorized.\"", isScam: false, feedback: "This is a legitimate automated fraud alert. The sender domain is correct, and it asks for a simple text reply, not a click to a shady link." },
+      { sender: "Mom", initial: "M", color: "bg-rose-500", meta: "+1 (555) 012-9844", body: "\"Hey! My card isn't working at the taxi. Can you Venmo $50 to @AirportHelp-Admin? ASAP!\"", isScam: true, feedback: "This is the 'Emergency Impersonator' scam. They create artificial urgency and ask for an untraceable payment method (Venmo) to an unknown handle." },
+      { sender: "Spotify", initial: "S", color: "bg-emerald-500", meta: "no-reply@spotify.com", body: "\"Your 'Year in Review 2026' is ready! See your top genres and beats.\"", isScam: false, feedback: "Legitimate marketing email. The sender domain is correct, and there is no artificial urgency or request for personal data." }
+    ];
+
+    let currentIndex = 0;
+    let score = 0;
+    const app = document.getElementById('app');
+
+    // 2. The Screens
+    function renderStart() {
+      app.innerHTML = `
+        <div class="flex-grow flex flex-col items-center justify-center text-center px-4">
+          <div class="w-16 h-16 bg-rose-100 text-rose-600 rounded-2xl flex items-center justify-center text-3xl mb-6 shadow-sm">🚨</div>
+          <h1 class="text-3xl font-black tracking-tight mb-4 text-slate-800">The Scam Sensor</h1>
+          <p class="text-slate-500 font-medium mb-8 leading-relaxed">Train your eyes to spot the subtle red flags in phishing emails, fake texts, and social engineering attacks before it's too late.</p>
+          <button onclick="startGame()" class="w-full py-4 rounded-2xl bg-slate-900 text-white font-bold tracking-widest uppercase shadow-xl hover:bg-slate-800 transition-all active:scale-95">Start Drill</button>
+        </div>
+      `;
+    }
+
+    function renderGame() {
+      const s = scenarios[currentIndex];
+      app.innerHTML = `
+        <div class="flex justify-between items-center mb-6 text-sm font-bold text-slate-400 uppercase tracking-widest px-2 pt-4">
+          <span>Threat ${currentIndex + 1} / ${scenarios.length}</span>
+          <span>Score: ${score}</span>
+        </div>
+        
+        <div class="flex-grow flex flex-col fade-in">
+          <div class="bg-white p-6 rounded-[2rem] shadow-sm border border-slate-200 mb-8 flex-grow flex flex-col">
+            
+            <div class="flex items-center gap-4 mb-6">
+              <div class="w-12 h-12 rounded-full ${s.color} text-white flex items-center justify-center font-bold text-xl shrink-0">${s.initial}</div>
+              <div class="overflow-hidden">
+                <h2 class="font-bold text-slate-900 truncate">${s.sender}</h2>
+                <p class="text-xs text-slate-400 truncate">${s.meta}</p>
+              </div>
+            </div>
+
+            <div class="bg-slate-50 p-6 rounded-2xl border border-slate-100 text-slate-700 font-medium leading-relaxed italic">
+              ${s.body}
+            </div>
+
+            <div id="feedback-zone" class="mt-auto hidden flex-col items-center text-center pt-6"></div>
+
+          </div>
+
+          <div id="action-buttons" class="grid grid-cols-2 gap-4 pb-4">
+            <button onclick="handleGuess(true)" class="py-5 rounded-2xl bg-rose-500 text-white font-black tracking-widest text-sm uppercase shadow-lg shadow-rose-500/20 hover:bg-rose-600 active:scale-95 transition-all">Scam</button>
+            <button onclick="handleGuess(false)" class="py-5 rounded-2xl bg-emerald-500 text-white font-black tracking-widest text-sm uppercase shadow-lg shadow-emerald-500/20 hover:bg-emerald-600 active:scale-95 transition-all">Legit</button>
+          </div>
+        </div>
+      `;
+    }
+
+    function handleGuess(userGuessedScam) {
+      const s = scenarios[currentIndex];
+      const isCorrect = userGuessedScam === s.isScam;
+      if (isCorrect) score++;
+
+      const buttons = document.getElementById('action-buttons');
+      const feedbackZone = document.getElementById('feedback-zone');
+      
+      buttons.innerHTML = `<button onclick="nextScenario()" class="w-full col-span-2 py-5 rounded-2xl bg-slate-900 text-white font-black tracking-widest text-sm uppercase shadow-xl hover:bg-slate-800 active:scale-95 transition-all">Continue</button>`;
+      
+      feedbackZone.classList.remove('hidden');
+      feedbackZone.innerHTML = `
+        <div class="w-10 h-10 rounded-full flex items-center justify-center mb-3 text-white ${isCorrect ? 'bg-emerald-500' : 'bg-rose-500'}">
+          ${isCorrect ? '✓' : '✗'}
+        </div>
+        <h3 class="font-bold text-slate-900 mb-2">${isCorrect ? 'Correct!' : 'You got phished.'}</h3>
+        <p class="text-sm text-slate-500 leading-relaxed">${s.feedback}</p>
+      `;
+    }
+
+    function renderEnd() {
+      const pass = score === scenarios.length;
+      app.innerHTML = `
+        <div class="flex-grow flex flex-col items-center justify-center text-center px-4 fade-in">
+          <div class="w-20 h-20 ${pass ? 'bg-emerald-100 text-emerald-600' : 'bg-rose-100 text-rose-600'} rounded-full flex items-center justify-center text-4xl mb-6 shadow-sm">
+            ${pass ? '🛡️' : '🎣'}
+          </div>
+          <h1 class="text-4xl font-black tracking-tight mb-2 text-slate-800">${score} / ${scenarios.length}</h1>
+          <h2 class="text-xl font-bold mb-4 ${pass ? 'text-emerald-500' : 'text-rose-500'}">${pass ? 'Ironclad Defense' : 'Security Breach'}</h2>
+          <p class="text-slate-500 font-medium mb-8 leading-relaxed max-w-xs">
+            Always check the raw sender email, beware of artificial urgency, and never click links in unexpected security alerts.
+          </p>
+          <button onclick="location.reload()" class="w-full py-4 rounded-2xl bg-slate-900 text-white font-bold tracking-widest uppercase shadow-xl hover:bg-slate-800 transition-all active:scale-95">Play Again</button>
+        </div>
+      `;
+    }
+
+    function nextScenario() {
+      currentIndex++;
+      if (currentIndex < scenarios.length) renderGame();
+      else renderEnd();
+    }
+
+    function startGame() {
+      currentIndex = 0;
+      score = 0;
+      renderGame();
+    }
+
+    // Initialize
+    renderStart();
+  </script>
+</body>
+</html>
