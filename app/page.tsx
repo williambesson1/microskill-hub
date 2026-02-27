@@ -177,13 +177,13 @@ export default function Home() {
 
   const getCardBackground = (category: string) => {
     switch (category?.toLowerCase()) {
-      case 'clear thinking & logic': return 'bg-gradient-to-br from-indigo-50/90 via-white/90 to-white/80';
-      case 'people & communication': return 'bg-gradient-to-br from-emerald-50/90 via-white/90 to-white/80';
-      case 'digital survival & media': return 'bg-gradient-to-br from-blue-50/90 via-white/90 to-white/80';
-      case 'mind & resilience': return 'bg-gradient-to-br from-rose-50/90 via-white/90 to-white/80';
-      case 'time & action': return 'bg-gradient-to-br from-amber-50/90 via-white/90 to-white/80';
-      case 'real-world math & money': return 'bg-gradient-to-br from-teal-50/90 via-white/90 to-white/80';
-      default: return 'bg-gradient-to-br from-slate-50/90 via-white/90 to-white/80';
+      case 'clear thinking & logic': return 'bg-gradient-to-br from-indigo-100 via-white/90 to-white/80';
+      case 'people & communication': return 'bg-gradient-to-br from-emerald-100 via-white/90 to-white/80';
+      case 'digital survival & media': return 'bg-gradient-to-br from-sky-100 via-white/90 to-white/80';
+      case 'mind & resilience': return 'bg-gradient-to-br from-rose-100 via-white/90 to-white/80';
+      case 'time & action': return 'bg-gradient-to-br from-amber-100 via-white/90 to-white/80';
+      case 'real-world math & money': return 'bg-gradient-to-br from-teal-100 via-white/90 to-white/80';
+      default: return 'bg-gradient-to-br from-slate-100 via-white/90 to-white/80';
     }
   };
 
