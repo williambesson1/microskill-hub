@@ -163,15 +163,6 @@ export default function Home() {
     return acc;
   }, {});
 
-  const getCategoryColor = (category: string) => {
-    switch (category?.toLowerCase()) {
-      case 'security': return 'bg-rose-500'; 
-      case 'grammar': return 'bg-blue-500'; 
-      case 'ai literacy': return 'bg-violet-500';
-      default: return 'bg-amber-500';
-    }
-  };
-
   const getIcon = (category: string) => {
     switch (category?.toLowerCase()) {
       case 'security': return <Shield size={18} />;
@@ -206,7 +197,7 @@ export default function Home() {
         </nav>
 
         <header className="pt-8 pb-10 sm:py-20 text-center">
-          <h1 className="text-4xl sm:text-5xl font-black mb-6 tracking-tighter max-w-4xl mx-auto px-4 leading-tight">Learn what actually matters. Fast.</h1>
+          <h1 className="text-4xl sm:text-5xl font-black mb-6 tracking-tighter max-w-4xl mx-auto px-4 leading-tight">Real-world skills <br />5 minutes at a time</h1>
           <div className="relative max-w-lg mx-auto px-4 sm:px-6">
               <Search className="absolute left-8 sm:left-10 top-1/2 -translate-y-1/2 text-slate-400" size={18}/>
               <input 
@@ -244,19 +235,20 @@ export default function Home() {
                     </Link>
                     
                     <div className="flex items-center gap-3 sm:gap-4 w-full sm:w-auto">
-                        <div className="flex w-full sm:w-auto bg-white/80 dark:bg-slate-900/80 p-1 rounded-xl backdrop-blur-md border border-slate-200 dark:border-slate-700 shadow-sm overflow-x-auto scrollbar-hide">
+                        {/* THE UPDATED SORT AREA */}
+                        <div className="flex w-full sm:w-auto bg-slate-100 dark:bg-slate-100 sm:bg-white/80 sm:dark:bg-slate-900/80 p-1.5 sm:p-2 rounded-xl backdrop-blur-md border border-slate-200 sm:dark:border-slate-700 shadow-sm overflow-x-auto scrollbar-hide">
                             {[
-                                { id: 'top', icon: <Trophy size={12}/>, label: 'Top' },
-                                { id: 'new', icon: <Clock size={12}/>, label: 'New' },
-                                { id: 'saved', icon: <Bookmark size={12}/>, label: 'Saved' }
+                                { id: 'top', icon: <Trophy size={14} className="sm:w-4 sm:h-4"/>, label: 'Top' },
+                                { id: 'new', icon: <Clock size={14} className="sm:w-4 sm:h-4"/>, label: 'New' },
+                                { id: 'saved', icon: <Bookmark size={14} className="sm:w-4 sm:h-4"/>, label: 'Saved' }
                             ].map((btn) => (
                                 <button
                                     key={btn.id}
                                     onClick={() => setCategorySort({ ...categorySort, [category]: btn.id as SortType })}
-                                    className={`flex flex-1 sm:flex-none items-center justify-center gap-1.5 px-3 py-1.5 rounded-lg text-[10px] font-bold transition-all whitespace-nowrap ${
+                                    className={`flex flex-1 sm:flex-none items-center justify-center gap-1.5 px-3 py-2 sm:px-5 sm:py-2.5 rounded-lg text-xs sm:text-sm font-bold transition-all whitespace-nowrap ${
                                         currentSort === btn.id 
                                         ? 'bg-indigo-600 text-white shadow-md' 
-                                        : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 hover:bg-black/5 dark:hover:bg-white/5'
+                                        : 'text-slate-500 dark:text-slate-500 sm:dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-800 sm:dark:hover:text-slate-200 hover:bg-black/5'
                                     }`}
                                 >
                                     {btn.icon} {btn.label}
@@ -278,13 +270,17 @@ export default function Home() {
                     const voteType = userVotes[skill.id];
                     const isFav = userFavorites.includes(skill.id);
                     const isCardLoading = isProcessing[skill.id];
+                    
+                    // THE UPDATED CARD LINE LOGIC
+                    const lineClass = isFav ? 'bg-rose-500' : voteType === 'up' ? 'bg-emerald-500' : 'bg-indigo-600/30';
+
                     return (
                       <Link 
                         key={skill.id} 
                         href={`/drills/${skill.slug}`} 
                         className="min-w-[240px] max-w-[240px] snap-start bg-card backdrop-blur-lg border border-slate-200/50 dark:border-slate-800/50 rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all flex flex-col"
                       >
-                        <div className={`h-1 w-full shrink-0 ${voteType === 'up' ? 'bg-emerald-500' : voteType === 'down' ? 'bg-rose-500' : 'bg-indigo-600/30'}`}></div>
+                        <div className={`h-1 w-full shrink-0 ${lineClass}`}></div>
                         <div className="p-5 flex flex-col flex-grow">
                           <div className="flex justify-between items-start mb-4">
                             <div className="h-9 w-9 bg-indigo-50 dark:bg-slate-800/50 rounded-lg flex items-center justify-center text-indigo-600">
@@ -295,23 +291,25 @@ export default function Home() {
                           <h3 className="text-base font-bold mb-6 leading-tight h-[60px] line-clamp-3">{skill.title}</h3>
                           
                           <div className="mt-auto pt-4 border-t border-slate-200/30 flex items-center justify-between">
-                            <div className="flex items-center gap-1 bg-slate-100 dark:bg-slate-800 p-1 rounded-full border border-slate-200 dark:border-slate-700 shadow-inner">
+                            
+                            {/* THE UPDATED VOTE AREA (Forced Light Mode) */}
+                            <div className="flex items-center gap-1 bg-slate-100 p-1.5 rounded-full border border-slate-200 shadow-inner">
                               <button 
                                 disabled={isCardLoading} 
                                 onClick={(e) => handleVote(e, skill.id, 'up')} 
-                                className={`p-1 rounded-full transition-all ${voteType === 'up' ? 'bg-emerald-500 text-white shadow-sm' : 'text-slate-500 dark:text-slate-400 hover:text-emerald-500 dark:hover:text-emerald-400'}`}
+                                className={`p-1 rounded-full transition-all ${voteType === 'up' ? 'bg-emerald-500 text-white shadow-sm' : 'text-slate-400 hover:text-emerald-500'}`}
                               >
                                 <ArrowUp size={14} strokeWidth={3}/>
                               </button>
                               
-                              <span className={`px-1 text-xs font-black ${voteType === 'up' ? 'text-emerald-600 dark:text-emerald-400' : voteType === 'down' ? 'text-rose-600 dark:text-rose-400' : 'text-slate-700 dark:text-slate-300'}`}>
+                              <span className={`px-1 text-xs font-black ${voteType === 'up' ? 'text-emerald-600' : voteType === 'down' ? 'text-rose-600' : 'text-slate-600'}`}>
                                 {skill.votes}
                               </span>
                               
                               <button 
                                 disabled={isCardLoading} 
                                 onClick={(e) => handleVote(e, skill.id, 'down')} 
-                                className={`p-1 rounded-full transition-all ${voteType === 'down' ? 'bg-rose-500 text-white shadow-sm' : 'text-slate-500 dark:text-slate-400 hover:text-rose-500 dark:hover:text-rose-400'}`}
+                                className={`p-1 rounded-full transition-all ${voteType === 'down' ? 'bg-rose-500 text-white shadow-sm' : 'text-slate-400 hover:text-rose-500'}`}
                               >
                                 <ArrowDown size={14} strokeWidth={3}/>
                               </button>

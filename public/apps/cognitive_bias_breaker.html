@@ -31,6 +31,10 @@
                 Mastering the art of overriding your brain's flawed shortcuts will save you from career-killing mistakes, financial leaks, and relationship drama.
             </p>
 
+            <div class="my-4 text-center text-sm text-slate-400 bg-slate-50 rounded-2xl p-4 border border-slate-100 hidden sm:block">
+                
+            </div>
+
             <div class="bg-slate-50 p-5 sm:p-6 rounded-3xl border border-slate-100 mb-8">
                 <h2 class="text-sm uppercase tracking-wider font-bold text-slate-500 mb-2">The Mental Model</h2>
                 <p class="text-slate-700 leading-relaxed">
@@ -51,10 +55,14 @@
             </div>
 
             <div class="px-4 py-8 sm:px-8 sm:py-10 flex-grow flex flex-col">
-                <div class="flex items-center gap-3 mb-6">
-                    <span id="scenario-icon" class="text-2xl bg-slate-100 p-2 rounded-xl">💼</span>
-                    <h2 id="scenario-title" class="text-xl font-bold text-slate-800">Scenario</h2>
-                    <span class="ml-auto text-sm font-semibold text-slate-400 bg-slate-100 px-3 py-1 rounded-full" id="progress-text">1 / 6</span>
+                <div class="flex items-center gap-2 sm:gap-3 mb-6">
+                    <span id="scenario-icon" class="text-xl sm:text-2xl bg-slate-100 p-2 rounded-xl">💼</span>
+                    <h2 id="scenario-title" class="text-lg sm:text-xl font-bold text-slate-800 truncate">Scenario</h2>
+                    
+                    <div class="ml-auto flex gap-2 items-center">
+                        <span id="score-text" class="whitespace-nowrap text-xs sm:text-sm font-semibold text-slate-500 bg-slate-100 px-2 sm:px-3 py-1 rounded-full">Score: 0</span>
+                        <span id="progress-text" class="whitespace-nowrap text-xs sm:text-sm font-semibold text-slate-500 bg-slate-100 px-2 sm:px-3 py-1 rounded-full">1 / 6</span>
+                    </div>
                 </div>
 
                 <div class="bg-slate-50 border-l-4 border-indigo-500 p-5 sm:p-6 rounded-r-2xl mb-8 shadow-sm">
@@ -65,7 +73,7 @@
                     </div>
 
                 <div id="feedback-container" class="hidden mt-auto">
-                    <div id="feedback-box" class="p-5 rounded-2xl mb-6 border">
+                    <div id="feedback-box" class="p-4 sm:p-5 rounded-2xl mb-6 border">
                         <div class="flex items-center gap-2 mb-2">
                             <span id="feedback-icon" class="text-xl">✅</span>
                             <h3 id="feedback-heading" class="font-bold text-lg"></h3>
@@ -86,6 +94,10 @@
                 </div>
                 <h1 class="text-3xl font-bold text-slate-900 mb-2">Drill Complete!</h1>
                 <p id="final-score" class="text-xl font-semibold text-indigo-600"></p>
+            </div>
+
+            <div class="my-4 text-center text-sm text-slate-400 bg-slate-50 rounded-2xl p-4 border border-slate-100 hidden sm:block">
+                
             </div>
 
             <div class="bg-slate-50 border border-slate-100 rounded-3xl p-5 sm:p-6 mb-8 flex-grow">
@@ -165,7 +177,7 @@
             { title: "Relationships / Norms", icon: "🍽️", situation: "Your partner spends all weekend cooking a spectacular dinner, and you want to show you value it.", choices: [{ text: "Give them a warm hug, pour wine, and enthusiastically express gratitude.", isCorrect: true }, { text: "Pull out your wallet and offer them $100 for their hard work.", isCorrect: false }, { text: "Tell them you'll cook next time so you are 'even'.", isCorrect: false }], feedback: "Injecting market norms (money, strict transactional ledgers) into a romantic relationship destroys the warm, social bond." },
             { title: "Daily Life / Self-Herding", icon: "☕", situation: "You ordered a $6 latte every morning because you were stressed last month. Now it's an autopilot habit.", choices: [{ text: "Upgrade to a $7 size since you are already used to spending $6.", isCorrect: false }, { text: "Break the chain. Question if you enjoy it enough to justify the cost, and try coffee at home.", isCorrect: true }, { text: "Assume that because you do it daily, it represents your core preferences.", isCorrect: false }], feedback: "Self-herding happens when we blindly repeat past random behaviors. Actively audit routines to separate mindless habits from good choices." },
 
-            // 20 Brand New Scenarios to Reach 50
+            // 20 Additional Scenarios to reach 50
             { title: "Software Eng / IKEA Effect", icon: "🛠️", situation: "You spent weeks building a custom internal analytics tool. A vendor offers a far better, cheaper tool.", choices: [{ text: "Keep your custom tool because you feel proud of having built it yourself.", isCorrect: false }, { text: "Run both tools simultaneously just to justify the time you spent.", isCorrect: false }, { text: "Scrap the custom tool. Adopt the superior vendor tool to improve overall efficiency.", isCorrect: true }], feedback: "The IKEA Effect makes us irrationally overvalue things we built ourselves. Evaluate solutions purely on their objective utility, not the sweat equity you put in." },
             { title: "Sales / Framing Effect", icon: "🗣️", situation: "You need to pitch a software product to a skeptical client regarding its reliability.", choices: [{ text: "Pitch that it has an average '10% downtime rate' to be brutally honest.", isCorrect: false }, { text: "Pitch that it has a '90% guaranteed uptime rate' to emphasize the positive.", isCorrect: true }, { text: "Avoid mentioning reliability metrics entirely until the client asks.", isCorrect: false }], feedback: "The Framing Effect shows that people react totally differently to the same information depending on how it's presented. Highlighting the positive frame secures trust without lying." },
             { title: "Investing / Survivorship Bias", icon: "🎯", situation: "You want to start a podcast because you see top creators making millions and going on tour.", choices: [{ text: "Assume it's an easy path to wealth based on those visible top performers.", isCorrect: false }, { text: "Look at the thousands of podcasts that fail or make zero money to calculate actual odds.", isCorrect: true }, { text: "Spend a massive budget on gear immediately to emulate the winners.", isCorrect: false }], feedback: "Survivorship Bias happens when we only look at the 'winners' who survived a process, totally ignoring the invisible graveyard of failures. Always analyze the baseline failure rate." },
@@ -200,6 +212,7 @@
                 screenEnd: document.getElementById('screen-end'),
                 progressBar: document.getElementById('progress-bar'),
                 progressText: document.getElementById('progress-text'),
+                scoreText: document.getElementById('score-text'),
                 title: document.getElementById('scenario-title'),
                 icon: document.getElementById('scenario-icon'),
                 text: document.getElementById('scenario-text'),
@@ -230,6 +243,8 @@
                 this.currentIndex = 0;
                 this.score = 0;
                 
+                this.els.scoreText.textContent = `Score: 0`;
+                
                 this.els.screenStart.classList.add('hidden');
                 this.els.screenDrill.classList.remove('hidden');
                 this.els.screenDrill.classList.add('flex');
@@ -259,7 +274,6 @@
                 this.els.choices.innerHTML = '';
                 shuffledChoices.forEach((choice, index) => {
                     const btn = document.createElement('button');
-                    // Removed shadow-sm to clean UI, adjusted padding for mobile
                     btn.className = 'choice-btn w-full text-left p-4 sm:p-5 rounded-2xl border-2 border-slate-200 bg-white hover:border-indigo-400 hover:bg-indigo-50 text-slate-700 font-medium leading-snug';
                     btn.innerHTML = `<span class="mr-3 text-slate-400 font-bold">${['A', 'B', 'C'][index]}</span> ${choice.text}`;
                     btn.onclick = () => this.handleChoice(btn, choice.isCorrect, scenario.feedback, shuffledChoices);
@@ -271,10 +285,13 @@
                 if (this.answered) return;
                 this.answered = true;
 
-                // Update Progress Bar
+                // Update Progress Bar & Score
                 this.els.progressBar.style.width = `${((this.currentIndex + 1) / this.drillScenarios.length) * 100}%`;
 
-                if (isCorrect) this.score++;
+                if (isCorrect) {
+                    this.score++;
+                    this.els.scoreText.textContent = `Score: ${this.score}`;
+                }
 
                 // Lock buttons and reveal styles
                 const buttons = this.els.choices.querySelectorAll('button');
