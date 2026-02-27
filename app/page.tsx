@@ -30,11 +30,11 @@ export default function Home() {
 
     if (currentUser) {
       const { data: votesData } = await supabase.from('user_votes').select('skill_id, vote_type').eq('user_id', currentUser.id);
-      const voteMap = (votesData || []).reduce((acc, v) => ({ ...acc, [v.skill_id]: v.vote_type === 1 ? 'up' : 'down' }), {});
+      const voteMap = (votesData || []).reduce((acc: any, v: any) => ({ ...acc, [v.skill_id]: v.vote_type === 1 ? 'up' : 'down' }), {});
       setUserVotes(voteMap);
 
       const { data: favData } = await supabase.from('user_favorites').select('skill_id').eq('user_id', currentUser.id);
-      setUserFavorites(favData?.map(f => f.skill_id) || []);
+      setUserFavorites(favData?.map((f: any) => f.skill_id) || []);
     }
     setLoading(false);
   };
@@ -175,13 +175,39 @@ export default function Home() {
   return (
     <div className="min-h-screen font-sans relative">
       
+      {/* Backgrounds */}
       <div className="fixed inset-0 z-0 bg-cover bg-center bg-fixed" style={{ backgroundImage: "url('/island-bg.png')" }} />
       <div className="fixed inset-0 z-1 bg-overlay transition-colors duration-300" />
 
       <div className="relative z-10 text-foreground transition-colors duration-300">
+        
+        {/* Global Nav Bar */}
         <nav className="sticky top-0 z-50 border-b bg-background/60 backdrop-blur-xl px-4 sm:px-6 h-16 flex items-center justify-between border-slate-200/50 dark:border-slate-800/50">
-          <Link href="/" className="flex items-center gap-2">
-              <div className="bg-indigo-600 p-1.5 sm:p-2 rounded-lg text-white shadow-lg"><Brain size={20} className="sm:w-[22px] sm:h-[22px]"/></div>
+          <Link href="/" className="flex items-center gap-2 sm:gap-3">
+              {/* THE NEW SKILL PRISM LOGO */}
+              <div className="w-8 h-8 sm:w-10 sm:h-10 shrink-0 shadow-lg rounded-lg bg-white dark:bg-slate-900 flex items-center justify-center p-1.5 border border-slate-200/50 dark:border-slate-700/50">
+                <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-full drop-shadow-md">
+                  <defs>
+                    <linearGradient id="indigoGrad" x1="0" y1="0" x2="1" y2="1">
+                      <stop offset="0%" stopColor="#818cf8" />
+                      <stop offset="100%" stopColor="#4f46e5" />
+                    </linearGradient>
+                    <linearGradient id="emeraldGrad" x1="0" y1="0" x2="1" y2="1">
+                      <stop offset="0%" stopColor="#34d399" />
+                      <stop offset="100%" stopColor="#059669" />
+                    </linearGradient>
+                    <linearGradient id="roseGrad" x1="0" y1="0" x2="1" y2="1">
+                      <stop offset="0%" stopColor="#fb7185" />
+                      <stop offset="100%" stopColor="#e11d48" />
+                    </linearGradient>
+                  </defs>
+                  <path d="M75 20 L25 20 L15 45 L50 45 Z" fill="url(#indigoGrad)" />
+                  <path d="M50 45 L15 45 L25 80 L60 80 Z" fill="url(#roseGrad)" />
+                  <path d="M85 55 L50 55 L60 80 L85 80 Z" fill="url(#emeraldGrad)" />
+                  <path d="M25 20 L50 45 L75 20 Z" fill="white" fillOpacity="0.2" />
+                  <path d="M15 45 L25 80 L50 45 Z" fill="black" fillOpacity="0.1" />
+                </svg>
+              </div>
               <span className="font-black uppercase tracking-tighter text-sm sm:text-base">Skealed</span>
           </Link>
           <div className="flex items-center gap-2 sm:gap-4">
@@ -196,8 +222,9 @@ export default function Home() {
           </div>
         </nav>
 
+        {/* Hero Section */}
         <header className="pt-8 pb-10 sm:py-20 text-center">
-          <h1 className="text-4xl sm:text-5xl font-black mb-6 tracking-tighter max-w-4xl mx-auto px-4 leading-tight">Real-world skills <br />5 minutes at a time</h1>
+          <h1 className="text-4xl sm:text-5xl font-black mb-6 tracking-tighter max-w-4xl mx-auto px-4 leading-tight">Learn what actually matters. Fast.</h1>
           <div className="relative max-w-lg mx-auto px-4 sm:px-6">
               <Search className="absolute left-8 sm:left-10 top-1/2 -translate-y-1/2 text-slate-400" size={18}/>
               <input 
@@ -210,6 +237,7 @@ export default function Home() {
           </div>
         </header>
 
+        {/* Main Content Area */}
         <main className="max-w-7xl mx-auto p-4 sm:p-6 md:p-12">
           {loading ? (
             <div className="text-center py-20 font-black text-slate-400 text-3xl animate-pulse uppercase">Loading Paradise...</div>
@@ -235,8 +263,9 @@ export default function Home() {
                     </Link>
                     
                     <div className="flex items-center gap-3 sm:gap-4 w-full sm:w-auto">
-                        {/* THE UPDATED SORT AREA */}
-                        <div className="flex w-full sm:w-auto bg-slate-100 dark:bg-slate-100 sm:bg-white/80 sm:dark:bg-slate-900/80 p-1.5 sm:p-2 rounded-xl backdrop-blur-md border border-slate-200 sm:dark:border-slate-700 shadow-sm overflow-x-auto scrollbar-hide">
+                        
+                        {/* SORT AREA - Light on mobile, adaptable on desktop */}
+                        <div className="flex w-full sm:w-auto bg-slate-100 sm:bg-white/80 dark:bg-slate-100 sm:dark:bg-slate-900/80 p-1.5 sm:p-2 rounded-xl backdrop-blur-md border border-slate-200 sm:dark:border-slate-700 shadow-sm overflow-x-auto scrollbar-hide">
                             {[
                                 { id: 'top', icon: <Trophy size={14} className="sm:w-4 sm:h-4"/>, label: 'Top' },
                                 { id: 'new', icon: <Clock size={14} className="sm:w-4 sm:h-4"/>, label: 'New' },
@@ -255,13 +284,26 @@ export default function Home() {
                                 </button>
                             ))}
                         </div>
+
+                        {/* DESKTOP CAROUSEL ARROWS - With solid light background */}
                         <div className="hidden sm:flex gap-2">
-                            <button onClick={() => scroll(category, 'left')} className="p-1.5 rounded-full bg-background/40 hover:bg-background/80 transition-all border border-slate-200/50 dark:border-slate-800/50"><ChevronLeft size={16}/></button>
-                            <button onClick={() => scroll(category, 'right')} className="p-1.5 rounded-full bg-background/40 hover:bg-background/80 transition-all border border-slate-200/50 dark:border-slate-800/50"><ChevronRight size={16}/></button>
+                            <button 
+                              onClick={() => scroll(category, 'left')} 
+                              className="p-1.5 rounded-full bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 transition-all border border-slate-200/50 dark:border-slate-700/50 text-slate-600 dark:text-slate-300 shadow-sm"
+                            >
+                              <ChevronLeft size={16}/>
+                            </button>
+                            <button 
+                              onClick={() => scroll(category, 'right')} 
+                              className="p-1.5 rounded-full bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 transition-all border border-slate-200/50 dark:border-slate-700/50 text-slate-600 dark:text-slate-300 shadow-sm"
+                            >
+                              <ChevronRight size={16}/>
+                            </button>
                         </div>
                     </div>
                 </div>
 
+                {/* HORIZONTAL SCROLL CAROUSEL */}
                 <div 
                   ref={el => { scrollRefs.current[category] = el; }}
                   className="flex gap-4 overflow-x-auto pb-6 scrollbar-hide scroll-smooth-custom px-1 snap-x min-h-[150px]"
@@ -271,7 +313,7 @@ export default function Home() {
                     const isFav = userFavorites.includes(skill.id);
                     const isCardLoading = isProcessing[skill.id];
                     
-                    // THE UPDATED CARD LINE LOGIC
+                    // CARD TOP LINE LOGIC (Red overrides Green overrides Purple)
                     const lineClass = isFav ? 'bg-rose-500' : voteType === 'up' ? 'bg-emerald-500' : 'bg-indigo-600/30';
 
                     return (
@@ -292,7 +334,7 @@ export default function Home() {
                           
                           <div className="mt-auto pt-4 border-t border-slate-200/30 flex items-center justify-between">
                             
-                            {/* THE UPDATED VOTE AREA (Forced Light Mode) */}
+                            {/* VOTE AREA - Forced Light Background */}
                             <div className="flex items-center gap-1 bg-slate-100 p-1.5 rounded-full border border-slate-200 shadow-inner">
                               <button 
                                 disabled={isCardLoading} 
@@ -315,6 +357,7 @@ export default function Home() {
                               </button>
                             </div>
 
+                            {/* HEART BUTTON */}
                             <button 
                               disabled={isCardLoading} 
                               onClick={(e) => handleToggleHeart(e, skill.id)} 
