@@ -188,7 +188,6 @@ export default function Home() {
         {/* Global Nav Bar */}
         <nav className="sticky top-0 z-50 border-b bg-background/60 backdrop-blur-xl px-4 sm:px-6 h-16 flex items-center justify-between border-slate-200/50 dark:border-slate-800/50">
           <Link href="/" className="flex items-center gap-2 sm:gap-3">
-              {/* THE NEW SKILL PRISM LOGO */}
               <div className="w-8 h-8 sm:w-10 sm:h-10 shrink-0 shadow-lg rounded-lg bg-white dark:bg-slate-900 flex items-center justify-center p-1.5 border border-slate-200/50 dark:border-slate-700/50">
                 <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-full drop-shadow-md">
                   <defs>
@@ -228,15 +227,17 @@ export default function Home() {
 
         {/* Hero Section */}
         <header className="pt-8 pb-10 sm:py-20 text-center">
-          <h1 className="text-4xl sm:text-5xl font-black mb-6 tracking-tighter max-w-4xl mx-auto px-4 leading-tight">Real-world skills<br />5 minutes at a time</h1>
+          <h1 className="text-4xl sm:text-5xl font-black mb-6 tracking-tighter max-w-4xl mx-auto px-4 leading-tight">Real-world skills.<br/>5 minutes at a time.</h1>
           <div className="relative max-w-lg mx-auto px-4 sm:px-6">
-              <Search className="absolute left-8 sm:left-10 top-1/2 -translate-y-1/2 text-slate-400" size={18}/>
+              <Search className="absolute left-8 sm:left-10 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-300" size={18}/>
+              
+              {/* UPDATED SEARCH BAR - VIVID DARK MODE */}
               <input 
                   type="text" 
                   placeholder="Search skills..." 
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full bg-card backdrop-blur-md border border-slate-200/50 dark:border-slate-800/50 py-3 pl-12 pr-4 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500 shadow-sm transition-all"
+                  className="w-full bg-white/60 dark:bg-slate-900/80 backdrop-blur-xl border border-slate-200/80 dark:border-slate-700/80 py-3 pl-12 pr-4 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500 shadow-md dark:shadow-xl dark:shadow-black/20 transition-all dark:text-slate-100 dark:placeholder:text-slate-400"
               />
           </div>
         </header>
@@ -257,18 +258,17 @@ export default function Home() {
                 
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-4 sm:mb-6 px-1 gap-3 sm:gap-4">
                     <Link 
-                        href={`/categories/${category.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '')}`}
+                        href={`/categories/${category.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '')}`} 
                         className="group/title inline-flex items-center gap-2"
                     >
-                        <h2 className="text-xs font-black uppercase tracking-[0.2em] text-slate-500 group-hover/title:text-indigo-500 transition-colors">
+                        {/* UPDATED CATEGORY NAME - BRIGHTER IN DARK MODE */}
+                        <h2 className="text-xs font-black uppercase tracking-[0.2em] text-slate-500 dark:text-slate-300 group-hover/title:text-indigo-600 dark:group-hover/title:text-indigo-400 transition-colors">
                             {category}
                         </h2>
-                        <ChevronRight size={14} className="text-indigo-500 group-hover/title:translate-x-1 transition-transform"/>
+                        <ChevronRight size={14} className="text-indigo-500 dark:text-indigo-400 group-hover/title:translate-x-1 transition-transform"/>
                     </Link>
                     
                     <div className="flex items-center gap-3 sm:gap-4 w-full sm:w-auto">
-                        
-                        {/* SORT AREA - Light on mobile, adaptable on desktop */}
                         <div className="flex w-full sm:w-auto bg-slate-100 sm:bg-white/80 dark:bg-slate-100 sm:dark:bg-slate-900/80 p-1.5 sm:p-2 rounded-xl backdrop-blur-md border border-slate-200 sm:dark:border-slate-700 shadow-sm overflow-x-auto scrollbar-hide">
                             {[
                                 { id: 'top', icon: <Trophy size={14} className="sm:w-4 sm:h-4"/>, label: 'Top' },
@@ -289,7 +289,6 @@ export default function Home() {
                             ))}
                         </div>
 
-                        {/* DESKTOP CAROUSEL ARROWS - With solid light background */}
                         <div className="hidden sm:flex gap-2">
                             <button 
                               onClick={() => scroll(category, 'left')} 
@@ -307,7 +306,6 @@ export default function Home() {
                     </div>
                 </div>
 
-                {/* HORIZONTAL SCROLL CAROUSEL */}
                 <div 
                   ref={el => { scrollRefs.current[category] = el; }}
                   className="flex gap-4 overflow-x-auto pb-6 scrollbar-hide scroll-smooth-custom px-1 snap-x min-h-[150px]"
@@ -317,14 +315,14 @@ export default function Home() {
                     const isFav = userFavorites.includes(skill.id);
                     const isCardLoading = isProcessing[skill.id];
                     
-                    // CARD TOP LINE LOGIC (Red overrides Green overrides Purple)
                     const lineClass = isFav ? 'bg-rose-500' : voteType === 'up' ? 'bg-emerald-500' : 'bg-indigo-600/30';
 
                     return (
                       <Link 
                         key={skill.id} 
                         href={`/drills/${skill.slug}`} 
-                        className="min-w-[240px] max-w-[240px] snap-start bg-card backdrop-blur-lg border border-slate-200/50 dark:border-slate-800/50 rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all flex flex-col"
+                        /* UPDATED CARD CLASSES - POPS IN DARK MODE */
+                        className="min-w-[240px] max-w-[240px] snap-start bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border border-slate-200/60 dark:border-slate-700/60 rounded-2xl overflow-hidden shadow-sm dark:shadow-xl dark:shadow-black/60 hover:shadow-xl dark:hover:border-indigo-500/30 dark:hover:shadow-indigo-500/10 hover:-translate-y-1 transition-all flex flex-col group"
                       >
                         <div className={`h-1 w-full shrink-0 ${lineClass}`}></div>
                         <div className="p-5 flex flex-col flex-grow">
@@ -336,9 +334,8 @@ export default function Home() {
                           </div>
                           <h3 className="text-base font-bold mb-6 leading-tight h-[60px] line-clamp-3">{skill.title}</h3>
                           
-                          <div className="mt-auto pt-4 border-t border-slate-200/30 flex items-center justify-between">
+                          <div className="mt-auto pt-4 border-t border-slate-200/30 dark:border-slate-700/50 flex items-center justify-between">
                             
-                            {/* VOTE AREA - Forced Light Background */}
                             <div className="flex items-center gap-1 bg-slate-100 p-1.5 rounded-full border border-slate-200 shadow-inner">
                               <button 
                                 disabled={isCardLoading} 
@@ -361,7 +358,6 @@ export default function Home() {
                               </button>
                             </div>
 
-                            {/* HEART BUTTON */}
                             <button 
                               disabled={isCardLoading} 
                               onClick={(e) => handleToggleHeart(e, skill.id)} 
