@@ -166,7 +166,7 @@ export default function Dashboard() {
                 <span className="font-black uppercase tracking-tighter text-sm sm:text-base hidden sm:inline-block text-slate-900">Skealed</span>
             </Link>
 
-                <span className="font-black uppercase tracking-tighter text-sm sm:text-base hidden sm:inline-block">Skealed</span>
+                
             </Link>
           </div>
           <div className="flex items-center gap-2 sm:gap-4">
