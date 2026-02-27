@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { supabase } from "../../lib/supabase"; 
 import { Mail, ArrowRight, Brain, Lightbulb, LogOut } from "lucide-react";
 import Link from "next/link";
-import ThemeToggle from "../../components/ThemeToggle";
+
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -61,14 +61,39 @@ export default function LoginPage() {
         {/* REBALANCED MOBILE NAV */}
         <nav className="sticky top-0 z-50 border-b bg-background/60 backdrop-blur-xl px-4 sm:px-6 h-16 flex items-center justify-between border-slate-200/50 dark:border-slate-800/50">
           <Link href="/" className="flex items-center gap-2">
-              <div className="bg-indigo-600 p-1.5 sm:p-2 rounded-lg text-white shadow-lg"><Brain size={20} className="sm:w-[22px] sm:h-[22px]"/></div>
-              <span className="font-black uppercase tracking-tighter text-sm sm:text-base">Skealed</span>
+          <Link href="/" className="flex items-center gap-2 sm:gap-3">
+              <div className="w-8 h-8 sm:w-10 sm:h-10 shrink-0 shadow-lg rounded-lg bg-white flex items-center justify-center p-1.5 border border-slate-200/50">
+                <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-full drop-shadow-md">
+                  <defs>
+                    <linearGradient id="indigoGrad" x1="0" y1="0" x2="1" y2="1">
+                      <stop offset="0%" stopColor="#818cf8" />
+                      <stop offset="100%" stopColor="#4f46e5" />
+                    </linearGradient>
+                    <linearGradient id="emeraldGrad" x1="0" y1="0" x2="1" y2="1">
+                      <stop offset="0%" stopColor="#34d399" />
+                      <stop offset="100%" stopColor="#059669" />
+                    </linearGradient>
+                    <linearGradient id="roseGrad" x1="0" y1="0" x2="1" y2="1">
+                      <stop offset="0%" stopColor="#fb7185" />
+                      <stop offset="100%" stopColor="#e11d48" />
+                    </linearGradient>
+                  </defs>
+                  <path d="M75 20 L25 20 L15 45 L50 45 Z" fill="url(#indigoGrad)" />
+                  <path d="M50 45 L15 45 L25 80 L60 80 Z" fill="url(#roseGrad)" />
+                  <path d="M85 55 L50 55 L60 80 L85 80 Z" fill="url(#emeraldGrad)" />
+                  <path d="M25 20 L50 45 L75 20 Z" fill="white" fillOpacity="0.2" />
+                  <path d="M15 45 L25 80 L50 45 Z" fill="black" fillOpacity="0.1" />
+                </svg>
+              </div>
+              <span className="font-black uppercase tracking-tighter text-sm sm:text-base text-slate-900">Skealed</span>
+          </Link>
+             
           </Link>
           <div className="flex items-center gap-2 sm:gap-4">
               <Link href="/ideas" className="hidden sm:flex items-center gap-1.5 text-xs font-bold text-slate-500 hover:text-amber-500 transition-colors uppercase tracking-widest">
              <Lightbulb size={14} /> Suggest Skill
              </Link>
-              <ThemeToggle />
+              
               {user ? (
                   <button onClick={() => supabase.auth.signOut()} className="text-slate-500 hover:text-rose-500 transition-colors p-1"><LogOut size={18} className="sm:w-[20px] sm:h-[20px]"/></button>
               ) : <Link href="/login" className="text-xs sm:text-sm font-bold opacity-70 hover:opacity-100 whitespace-nowrap">SIGN IN</Link>}
