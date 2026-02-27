@@ -228,7 +228,7 @@ export default function Home() {
 
         {/* Hero Section */}
         <header className="pt-8 pb-10 sm:py-20 text-center">
-          <h1 className="text-4xl sm:text-5xl font-black mb-6 tracking-tighter max-w-4xl mx-auto px-4 leading-tight">Learn what actually matters. Fast.</h1>
+          <h1 className="text-4xl sm:text-5xl font-black mb-6 tracking-tighter max-w-4xl mx-auto px-4 leading-tight">Real-world skills<br />5 minutes at a time</h1>
           <div className="relative max-w-lg mx-auto px-4 sm:px-6">
               <Search className="absolute left-8 sm:left-10 top-1/2 -translate-y-1/2 text-slate-400" size={18}/>
               <input 

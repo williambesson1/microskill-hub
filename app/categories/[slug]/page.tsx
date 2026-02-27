@@ -42,9 +42,20 @@ export default function CategoryPage() {
   
   const [isProcessing, setIsProcessing] = useState<{[key: number]: boolean}>({});
 
-  const categoryTitle = (slug?.toString() || "")
-    .replace(/-/g, ' ')
-    .replace(/\b\w/g, l => l.toUpperCase());
+// The Decoder Ring for our URLs
+const rawSlug = slug?.toString() || "";
+  
+const CATEGORY_MAP: Record<string, string> = {
+  'clear-thinking-logic': 'Clear Thinking & Logic',
+  'people-communication': 'People & Communication',
+  'digital-survival-media': 'Digital Survival & Media',
+  'mind-resilience': 'Mind & Resilience',
+  'time-action': 'Time & Action',
+  'real-world-math-money': 'Real-World Math & Money',
+};
+
+// Check the map first. If it's a new custom category without an "&", fall back to the normal dash-replacement.
+const categoryTitle = CATEGORY_MAP[rawSlug] || rawSlug.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
 
   const fetchData = async (currentUser: any) => {
     setLoading(true);
