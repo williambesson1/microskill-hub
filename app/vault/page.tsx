@@ -132,7 +132,32 @@ export default function Dashboard() {
             </Link>
             <div className="h-6 sm:h-8 w-px bg-slate-200/50 dark:bg-slate-800/50 mx-1 sm:mx-2" />
             <Link href="/" className="flex items-center gap-2">
-                <div className="bg-indigo-600 p-1.5 sm:p-2 rounded-lg text-white shadow-lg"><Brain size={20} className="sm:w-[22px] sm:h-[22px]"/></div>
+                
+                {/* THE NEW SKILL PRISM LOGO */}
+                <div className="w-8 h-8 sm:w-10 sm:h-10 shrink-0 shadow-lg rounded-lg bg-white dark:bg-slate-900 flex items-center justify-center p-1.5 border border-slate-200/50 dark:border-slate-700/50">
+                  <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-full drop-shadow-md">
+                    <defs>
+                      <linearGradient id="indigoGrad" x1="0" y1="0" x2="1" y2="1">
+                        <stop offset="0%" stopColor="#818cf8" />
+                        <stop offset="100%" stopColor="#4f46e5" />
+                      </linearGradient>
+                      <linearGradient id="emeraldGrad" x1="0" y1="0" x2="1" y2="1">
+                        <stop offset="0%" stopColor="#34d399" />
+                        <stop offset="100%" stopColor="#059669" />
+                      </linearGradient>
+                      <linearGradient id="roseGrad" x1="0" y1="0" x2="1" y2="1">
+                        <stop offset="0%" stopColor="#fb7185" />
+                        <stop offset="100%" stopColor="#e11d48" />
+                      </linearGradient>
+                    </defs>
+                    <path d="M75 20 L25 20 L15 45 L50 45 Z" fill="url(#indigoGrad)" />
+                    <path d="M50 45 L15 45 L25 80 L60 80 Z" fill="url(#roseGrad)" />
+                    <path d="M85 55 L50 55 L60 80 L85 80 Z" fill="url(#emeraldGrad)" />
+                    <path d="M25 20 L50 45 L75 20 Z" fill="white" fillOpacity="0.2" />
+                    <path d="M15 45 L25 80 L50 45 Z" fill="black" fillOpacity="0.1" />
+                  </svg>
+                </div>
+
                 <span className="font-black uppercase tracking-tighter text-sm sm:text-base hidden sm:inline-block">Skealed</span>
             </Link>
           </div>
@@ -172,9 +197,21 @@ export default function Dashboard() {
           <section className="mb-16">
             <div className="flex items-center justify-between mb-8">
               <h3 className="text-3xl font-black tracking-tighter text-rose-500 flex items-center gap-3">Favorites <Heart size={24} fill="currentColor"/></h3>
-              <div className="flex items-center gap-2">
-                <button onClick={() => scroll(favRef, 'left')} className="p-2 rounded-full bg-white/80 dark:bg-slate-800/80 backdrop-blur-md border border-slate-200/50 dark:border-slate-700/50 hover:bg-white dark:hover:bg-slate-700 transition-all shadow-sm"><ChevronLeft size={20} className="text-indigo-600" /></button>
-                <button onClick={() => scroll(favRef, 'right')} className="p-2 rounded-full bg-white/80 dark:bg-slate-800/80 backdrop-blur-md border border-slate-200/50 dark:border-slate-700/50 hover:bg-white dark:hover:bg-slate-700 transition-all shadow-sm"><ChevronRight size={20} className="text-indigo-600" /></button>
+              
+              {/* UPDATED FAVORITE CAROUSEL ARROWS */}
+              <div className="flex gap-2">
+                <button 
+                  onClick={() => scroll(favRef, 'left')} 
+                  className="p-1.5 sm:p-2 rounded-full bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 transition-all border border-slate-200/50 dark:border-slate-700/50 text-slate-600 dark:text-slate-300 shadow-sm"
+                >
+                  <ChevronLeft size={18}/>
+                </button>
+                <button 
+                  onClick={() => scroll(favRef, 'right')} 
+                  className="p-1.5 sm:p-2 rounded-full bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 transition-all border border-slate-200/50 dark:border-slate-700/50 text-slate-600 dark:text-slate-300 shadow-sm"
+                >
+                  <ChevronRight size={18}/>
+                </button>
               </div>
             </div>
             <div ref={favRef} className="flex gap-4 overflow-x-auto pb-6 scrollbar-hide snap-x px-2">
@@ -194,9 +231,21 @@ export default function Dashboard() {
           <section className="mb-20">
             <div className="flex items-center justify-between mb-8">
               <h3 className="text-3xl font-black tracking-tighter text-emerald-500 flex items-center gap-3">Upvoted <ArrowUp size={24} strokeWidth={3}/></h3>
-              <div className="flex items-center gap-2">
-                <button onClick={() => scroll(voteRef, 'left')} className="p-2 rounded-full bg-white/80 dark:bg-slate-800/80 backdrop-blur-md border border-slate-200/50 dark:border-slate-700/50 hover:bg-white dark:hover:bg-slate-700 transition-all shadow-sm"><ChevronLeft size={20} className="text-indigo-600" /></button>
-                <button onClick={() => scroll(voteRef, 'right')} className="p-2 rounded-full bg-white/80 dark:bg-slate-800/80 backdrop-blur-md border border-slate-200/50 dark:border-slate-700/50 hover:bg-white dark:hover:bg-slate-700 transition-all shadow-sm"><ChevronRight size={20} className="text-indigo-600" /></button>
+              
+              {/* UPDATED UPVOTE CAROUSEL ARROWS */}
+              <div className="flex gap-2">
+                <button 
+                  onClick={() => scroll(voteRef, 'left')} 
+                  className="p-1.5 sm:p-2 rounded-full bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 transition-all border border-slate-200/50 dark:border-slate-700/50 text-slate-600 dark:text-slate-300 shadow-sm"
+                >
+                  <ChevronLeft size={18}/>
+                </button>
+                <button 
+                  onClick={() => scroll(voteRef, 'right')} 
+                  className="p-1.5 sm:p-2 rounded-full bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 transition-all border border-slate-200/50 dark:border-slate-700/50 text-slate-600 dark:text-slate-300 shadow-sm"
+                >
+                  <ChevronRight size={18}/>
+                </button>
               </div>
             </div>
             <div ref={voteRef} className="flex gap-4 overflow-x-auto pb-6 scrollbar-hide snap-x px-2">
@@ -225,7 +274,12 @@ export default function Dashboard() {
                     Clears your upvotes and favorites without deleting your account.
                   </p>
                 </div>
-                <button onClick={handleWipeData} className="w-full py-3 rounded-2xl bg-white dark:bg-rose-500/20 hover:bg-rose-100 dark:hover:bg-rose-500/30 text-rose-600 dark:text-rose-300 font-bold text-xs uppercase tracking-widest transition-all border border-rose-200 dark:border-rose-500/30">
+                
+                {/* UPDATED CLEAR DATA BUTTON */}
+                <button 
+                  onClick={handleWipeData} 
+                  className="w-full py-4 rounded-2xl bg-white dark:bg-slate-100 text-red-600 font-black text-sm tracking-widest uppercase shadow-md border border-red-200 hover:bg-slate-50 transition-all active:scale-95 mt-4"
+                >
                   Clear All Data
                 </button>
               </div>
