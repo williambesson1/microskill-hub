@@ -5,7 +5,8 @@ import Link from 'next/link';
 import { 
   ArrowLeft, LogOut, Shield, GraduationCap, Brain, 
   Zap, Heart, ArrowUp, User, Camera, Trash2, Search, 
-  X, ChevronLeft, ChevronRight, Lightbulb
+  X, ChevronLeft, ChevronRight, Lightbulb,
+  Users, Activity, Target, PieChart
 } from 'lucide-react';
 import { supabase } from '../../lib/supabase'; 
 import ThemeToggle from '../../components/ThemeToggle';
@@ -107,9 +108,12 @@ export default function Dashboard() {
 
   const getIcon = (category: string) => {
     switch (category?.toLowerCase()) {
-      case 'security': return <Shield size={18} />;
-      case 'grammar': return <GraduationCap size={18} />;
-      case 'ai literacy': return <Brain size={18} />;
+      case 'clear thinking & logic': return <Brain size={18} />;
+      case 'people & communication': return <Users size={18} />;
+      case 'digital survival & media': return <Shield size={18} />;
+      case 'mind & resilience': return <Activity size={18} />;
+      case 'time & action': return <Target size={18} />;
+      case 'real-world math & money': return <PieChart size={18} />;
       default: return <Zap size={18} />;
     }
   };

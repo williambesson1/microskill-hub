@@ -5,7 +5,8 @@ import Link from 'next/link';
 import { 
   ArrowUp, ArrowDown, Share2, Heart, Brain, Shield, 
   GraduationCap, Zap, Search, LogOut, ChevronRight, 
-  ChevronLeft, Trophy, Clock, Bookmark, Lightbulb
+  ChevronLeft, Trophy, Clock, Bookmark, Lightbulb,
+  Users, Activity, Target, PieChart
 } from 'lucide-react';
 import { supabase } from '../lib/supabase'; 
 import ThemeToggle from '../components/ThemeToggle'; 
@@ -165,9 +166,12 @@ export default function Home() {
 
   const getIcon = (category: string) => {
     switch (category?.toLowerCase()) {
-      case 'security': return <Shield size={18} />;
-      case 'grammar': return <GraduationCap size={18} />;
-      case 'ai literacy': return <Brain size={18} />;
+      case 'clear thinking & logic': return <Brain size={18} />;
+      case 'people & communication': return <Users size={18} />;
+      case 'digital survival & media': return <Shield size={18} />;
+      case 'mind & resilience': return <Activity size={18} />;
+      case 'time & action': return <Target size={18} />;
+      case 'real-world math & money': return <PieChart size={18} />;
       default: return <Zap size={18} />;
     }
   };
@@ -253,7 +257,7 @@ export default function Home() {
                 
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-4 sm:mb-6 px-1 gap-3 sm:gap-4">
                     <Link 
-                        href={`/categories/${category.toLowerCase().replace(/\s+/g, '-')}`} 
+                        href={`/categories/${category.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '')}`}
                         className="group/title inline-flex items-center gap-2"
                     >
                         <h2 className="text-xs font-black uppercase tracking-[0.2em] text-slate-500 group-hover/title:text-indigo-500 transition-colors">

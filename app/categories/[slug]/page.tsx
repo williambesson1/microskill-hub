@@ -18,7 +18,11 @@ import {
   Clock, 
   Bookmark,
   Lightbulb,
-  LogOut
+  LogOut,
+  Users,
+  Activity,
+  Target,
+  PieChart
 } from 'lucide-react';
 import { supabase } from '../../../lib/supabase'; 
 import ThemeToggle from '../../../components/ThemeToggle'; 
@@ -54,11 +58,11 @@ export default function CategoryPage() {
 
     if (currentUser) {
       const { data: votesData } = await supabase.from('user_votes').select('skill_id, vote_type').eq('user_id', currentUser.id);
-      const voteMap = (votesData || []).reduce((acc, v) => ({ ...acc, [v.skill_id]: v.vote_type === 1 ? 'up' : 'down' }), {});
+      const voteMap = (votesData || []).reduce((acc: any, v: any) => ({ ...acc, [v.skill_id]: v.vote_type === 1 ? 'up' : 'down' }), {});
       setUserVotes(voteMap);
 
       const { data: favData } = await supabase.from('user_favorites').select('skill_id').eq('user_id', currentUser.id);
-      setUserFavorites(favData?.map(f => f.skill_id) || []);
+      setUserFavorites(favData?.map((f: any) => f.skill_id) || []);
     }
     setLoading(false);
   };
@@ -162,11 +166,15 @@ export default function CategoryPage() {
     else { await navigator.clipboard.writeText(url); alert("Copied!"); }
   };
 
+  // UPDATED CATEGORY ICONS
   const getIcon = (category: string) => {
     switch (category?.toLowerCase()) {
-      case 'security': return <Shield size={18} />;
-      case 'grammar': return <GraduationCap size={18} />;
-      case 'ai literacy': return <Brain size={18} />;
+      case 'clear thinking & logic': return <Brain size={18} />;
+      case 'people & communication': return <Users size={18} />;
+      case 'digital survival & media': return <Shield size={18} />;
+      case 'mind & resilience': return <Activity size={18} />;
+      case 'time & action': return <Target size={18} />;
+      case 'real-world math & money': return <PieChart size={18} />;
       default: return <Zap size={18} />;
     }
   };
@@ -178,7 +186,7 @@ export default function CategoryPage() {
 
       <div className="relative z-10 text-foreground transition-colors duration-300">
         
-        {/* REBALANCED MOBILE NAV WITH BACK BUTTON */}
+        {/* UNIFIED GLOBAL NAVIGATION BAR */}
         <nav className="sticky top-0 z-50 border-b bg-background/60 backdrop-blur-xl px-2 sm:px-6 h-16 flex items-center justify-between border-slate-200/50 dark:border-slate-800/50">
           <div className="flex items-center gap-1 sm:gap-2">
             <button 
@@ -189,7 +197,32 @@ export default function CategoryPage() {
             </button>
             <div className="h-6 sm:h-8 w-px bg-slate-200/50 dark:bg-slate-800/50 mx-1 sm:mx-2" />
             <Link href="/" className="flex items-center gap-2">
-                <div className="bg-indigo-600 p-1.5 sm:p-2 rounded-lg text-white shadow-lg"><Brain size={20} className="sm:w-[22px] sm:h-[22px]"/></div>
+                
+                {/* THE NEW SKILL PRISM LOGO */}
+                <div className="w-8 h-8 sm:w-10 sm:h-10 shrink-0 shadow-lg rounded-lg bg-white dark:bg-slate-900 flex items-center justify-center p-1.5 border border-slate-200/50 dark:border-slate-700/50">
+                  <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-full drop-shadow-md">
+                    <defs>
+                      <linearGradient id="indigoGrad" x1="0" y1="0" x2="1" y2="1">
+                        <stop offset="0%" stopColor="#818cf8" />
+                        <stop offset="100%" stopColor="#4f46e5" />
+                      </linearGradient>
+                      <linearGradient id="emeraldGrad" x1="0" y1="0" x2="1" y2="1">
+                        <stop offset="0%" stopColor="#34d399" />
+                        <stop offset="100%" stopColor="#059669" />
+                      </linearGradient>
+                      <linearGradient id="roseGrad" x1="0" y1="0" x2="1" y2="1">
+                        <stop offset="0%" stopColor="#fb7185" />
+                        <stop offset="100%" stopColor="#e11d48" />
+                      </linearGradient>
+                    </defs>
+                    <path d="M75 20 L25 20 L15 45 L50 45 Z" fill="url(#indigoGrad)" />
+                    <path d="M50 45 L15 45 L25 80 L60 80 Z" fill="url(#roseGrad)" />
+                    <path d="M85 55 L50 55 L60 80 L85 80 Z" fill="url(#emeraldGrad)" />
+                    <path d="M25 20 L50 45 L75 20 Z" fill="white" fillOpacity="0.2" />
+                    <path d="M15 45 L25 80 L50 45 Z" fill="black" fillOpacity="0.1" />
+                  </svg>
+                </div>
+
                 <span className="font-black uppercase tracking-tighter text-sm sm:text-base hidden sm:inline-block">Skealed</span>
             </Link>
           </div>
@@ -205,7 +238,6 @@ export default function CategoryPage() {
           </div>
         </nav>
 
-        {/* TIGHTER MOBILE HEADER */}
         <header className="pt-8 pb-10 sm:py-16 text-center">
           <h1 className="text-4xl sm:text-5xl font-black mb-6 sm:mb-10 tracking-tighter capitalize leading-tight">{categoryTitle}</h1>
           <div className="max-w-5xl mx-auto px-4 sm:px-6 flex flex-col md:flex-row gap-4 sm:gap-6 items-center justify-between">
@@ -220,20 +252,20 @@ export default function CategoryPage() {
                 />
               </div>
 
-              {/* HIGH CONTRAST SEGMENTED CONTROL */}
-              <div className="flex w-full sm:w-auto bg-white/80 dark:bg-slate-900/80 p-1 rounded-xl backdrop-blur-md border border-slate-200 dark:border-slate-700 shadow-sm overflow-x-auto scrollbar-hide">
+              {/* SORT AREA - Light on mobile, adaptable on desktop */}
+              <div className="flex w-full sm:w-auto bg-slate-100 sm:bg-white/80 dark:bg-slate-100 sm:dark:bg-slate-900/80 p-1.5 sm:p-2 rounded-xl backdrop-blur-md border border-slate-200 sm:dark:border-slate-700 shadow-sm overflow-x-auto scrollbar-hide">
                 {[
-                    { id: 'top', icon: <Trophy size={12}/>, label: 'Top' },
-                    { id: 'new', icon: <Clock size={12}/>, label: 'New' },
-                    { id: 'saved', icon: <Bookmark size={12}/>, label: 'Saved' }
+                    { id: 'top', icon: <Trophy size={14} className="sm:w-4 sm:h-4"/>, label: 'Top' },
+                    { id: 'new', icon: <Clock size={14} className="sm:w-4 sm:h-4"/>, label: 'New' },
+                    { id: 'saved', icon: <Bookmark size={14} className="sm:w-4 sm:h-4"/>, label: 'Saved' }
                 ].map((btn) => (
                     <button
                         key={btn.id}
                         onClick={() => setSortType(btn.id as SortType)}
-                        className={`flex flex-1 sm:flex-none items-center justify-center gap-1.5 px-4 py-2 sm:px-3 sm:py-1.5 rounded-lg text-[10px] font-bold transition-all whitespace-nowrap ${
+                        className={`flex flex-1 sm:flex-none items-center justify-center gap-1.5 px-3 py-2 sm:px-5 sm:py-2.5 rounded-lg text-xs sm:text-sm font-bold transition-all whitespace-nowrap ${
                             sortType === btn.id 
                             ? 'bg-indigo-600 text-white shadow-md' 
-                            : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 hover:bg-black/5 dark:hover:bg-white/5'
+                            : 'text-slate-500 dark:text-slate-500 sm:dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-800 sm:dark:hover:text-slate-200 hover:bg-black/5'
                         }`}
                     >
                         {btn.icon} {btn.label}
@@ -253,13 +285,17 @@ export default function CategoryPage() {
                 const voteType = userVotes[skill.id];
                 const isFav = userFavorites.includes(skill.id);
                 const isCardLoading = isProcessing[skill.id];
+                
+                // NEW CARD TOP LINE LOGIC (Red overrides Green overrides Purple)
+                const lineClass = isFav ? 'bg-rose-500' : voteType === 'up' ? 'bg-emerald-500' : 'bg-indigo-600/30';
+
                 return (
                   <Link 
                     key={skill.id} 
                     href={`/drills/${skill.slug}`}
                     className="bg-card backdrop-blur-lg border border-slate-200/50 dark:border-slate-800/50 rounded-2xl overflow-hidden shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all group flex flex-col"
                   >
-                    <div className={`h-1 w-full shrink-0 ${voteType === 'up' ? 'bg-emerald-500' : voteType === 'down' ? 'bg-rose-500' : 'bg-indigo-600/30'}`}></div>
+                    <div className={`h-1 w-full shrink-0 ${lineClass}`}></div>
                     <div className="p-5 flex flex-col flex-grow">
                       <div className="flex justify-between items-start mb-4">
                         <div className="h-9 w-9 bg-indigo-50 dark:bg-slate-800/50 rounded-lg flex items-center justify-center text-indigo-600">
@@ -271,28 +307,31 @@ export default function CategoryPage() {
                       <h3 className="text-base font-bold mb-6 leading-tight h-[60px] line-clamp-3">{skill.title}</h3>
                       
                       <div className="mt-auto pt-4 border-t border-slate-200/30 flex items-center justify-between">
-                        <div className="flex items-center gap-1 bg-slate-100 dark:bg-slate-800 p-1 rounded-full border border-slate-200 dark:border-slate-700 shadow-inner">
+                        
+                        {/* VOTE AREA - Forced Light Background */}
+                        <div className="flex items-center gap-1 bg-slate-100 p-1.5 rounded-full border border-slate-200 shadow-inner">
                           <button 
                             disabled={isCardLoading} 
                             onClick={(e) => handleVote(e, skill.id, 'up')} 
-                            className={`p-1 rounded-full transition-all ${voteType === 'up' ? 'bg-emerald-500 text-white shadow-sm' : 'text-slate-500 dark:text-slate-400 hover:text-emerald-500 dark:hover:text-emerald-400'}`}
+                            className={`p-1 rounded-full transition-all ${voteType === 'up' ? 'bg-emerald-500 text-white shadow-sm' : 'text-slate-400 hover:text-emerald-500'}`}
                           >
                             <ArrowUp size={14} strokeWidth={3}/>
                           </button>
                           
-                          <span className={`px-1 text-xs font-black ${voteType === 'up' ? 'text-emerald-600 dark:text-emerald-400' : voteType === 'down' ? 'text-rose-600 dark:text-rose-400' : 'text-slate-700 dark:text-slate-300'}`}>
+                          <span className={`px-1 text-xs font-black ${voteType === 'up' ? 'text-emerald-600' : voteType === 'down' ? 'text-rose-600' : 'text-slate-600'}`}>
                             {skill.votes}
                           </span>
                           
                           <button 
                             disabled={isCardLoading} 
                             onClick={(e) => handleVote(e, skill.id, 'down')} 
-                            className={`p-1 rounded-full transition-all ${voteType === 'down' ? 'bg-rose-500 text-white shadow-sm' : 'text-slate-500 dark:text-slate-400 hover:text-rose-500 dark:hover:text-rose-400'}`}
+                            className={`p-1 rounded-full transition-all ${voteType === 'down' ? 'bg-rose-500 text-white shadow-sm' : 'text-slate-400 hover:text-rose-500'}`}
                           >
                             <ArrowDown size={14} strokeWidth={3}/>
                           </button>
                         </div>
 
+                        {/* HEART BUTTON */}
                         <button 
                           disabled={isCardLoading} 
                           onClick={(e) => handleToggleHeart(e, skill.id)} 
