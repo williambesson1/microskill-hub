@@ -52,7 +52,7 @@ export default function DrillPage() {
       <main className="relative z-10 flex-grow flex items-center justify-center p-4 sm:p-6">
         <div className="w-full max-w-4xl h-[80vh] bg-white dark:bg-slate-950 rounded-[2rem] shadow-2xl overflow-hidden border border-slate-200/50 dark:border-slate-800/50">
           <iframe 
-            src={`/drills/${slug}.html`} 
+            src={`/apps/${slug}.html`} 
             className="w-full h-full border-0 bg-transparent"
             title={`${slug} interactive drill`}
             allowFullScreen
