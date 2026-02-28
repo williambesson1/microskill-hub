@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>The Bias Breaker — Skealed</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0c0d12;--surface:#13141d;--s2:#191a27;--s3:#1f2133;
+  --border:#252638;--border2:#2e3048;
+  --amber:#f0a500;--amber-dim:#7a5200;--amber-glow:rgba(240,165,0,0.12);
+  --green:#1fbe6a;--green-dim:rgba(31,190,106,0.12);--green-border:rgba(31,190,106,0.35);
+  --red:#e8445a;--red-dim:rgba(232,68,90,0.12);--red-border:rgba(232,68,90,0.35);
+  --text:#e2e4ef;--muted:#5a5f7a;--subtle:#3a3f58;
+  --r:16px;--r2:20px;--r3:24px;
+}
+html,body{height:100%}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;align-items:center;justify-content:center;padding:12px;background-image:radial-gradient(ellipse 70% 50% at 50% -5%,rgba(240,165,0,0.07) 0%,transparent 65%);}
+h1,h2,h3{font-family:'Syne',sans-serif}
+button{font-family:inherit;cursor:pointer;border:none;outline:none}
+.card{width:100%;max-width:660px;background:var(--surface);border:1px solid var(--border);border-radius:28px;overflow:hidden;display:flex;flex-direction:column;min-height:min(700px,96vh);position:relative;box-shadow:0 24px 80px rgba(0,0,0,0.5);}
+/* START */
+#ss{padding:40px 36px;display:flex;flex-direction:column;gap:20px;flex:1}
+.icon-box{width:68px;height:68px;border-radius:18px;display:flex;align-items:center;justify-content:center;font-size:34px;background:linear-gradient(135deg,rgba(240,165,0,0.18),rgba(240,165,0,0.04));border:1px solid rgba(240,165,0,0.25);}
+.card-label{font-size:11px;letter-spacing:.15em;text-transform:uppercase;color:var(--amber);font-weight:600}
+#ss h1{font-size:clamp(26px,5vw,36px);color:#fff;line-height:1.15;margin-top:6px}
+#ss h1 span{color:var(--amber)}
+.tagline{color:var(--muted);font-size:14px;line-height:1.65}
+.info-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+.info-pill{background:var(--s2);border:1px solid var(--border);border-radius:14px;padding:12px 10px;text-align:center}
+.info-pill strong{display:block;font-size:18px;font-weight:700;color:var(--text);font-family:'Syne',sans-serif}
+.info-pill span{font-size:11px;color:var(--muted)}
+.model-box{background:var(--s2);border:1px solid var(--border);border-radius:var(--r2);padding:18px 20px}
+.model-box .lbl{font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);font-weight:600;margin-bottom:10px}
+.mechanics-row{display:flex;gap:6px;flex-wrap:wrap}
+.mech-chip{font-size:11px;font-weight:600;padding:5px 10px;border-radius:20px;background:var(--s3);border:1px solid var(--border2);color:var(--muted)}
+.start-btn{margin-top:auto;width:100%;background:var(--amber);color:#0c0d12;font-family:'Syne',sans-serif;font-size:16px;font-weight:800;padding:17px;border-radius:var(--r2);transition:all .2s;display:flex;align-items:center;justify-content:center;gap:10px;}
+.start-btn:hover{transform:translateY(-2px);box-shadow:0 10px 36px rgba(240,165,0,0.32)}
+/* DRILL */
+#sd{display:none;flex-direction:column;flex:1}
+.drill-header{padding:18px 24px 0;display:flex;flex-direction:column;gap:12px}
+.top-row{display:flex;align-items:center;gap:8px}
+.diff-badge{font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:4px 10px;border-radius:20px;transition:all .4s}
+.d1{background:rgba(31,190,106,.15);color:#4ae89a;border:1px solid rgba(31,190,106,.3)}
+.d2{background:rgba(240,165,0,.15);color:var(--amber);border:1px solid rgba(240,165,0,.3)}
+.d3{background:rgba(232,68,90,.15);color:#f77;border:1px solid rgba(232,68,90,.3)}
+.streak-badge{display:flex;align-items:center;gap:4px;font-size:13px;font-weight:600;background:var(--s2);border:1px solid var(--border);padding:4px 10px;border-radius:20px;}
+.streak-badge.pop{animation:pop .3s ease}
+@keyframes pop{0%,100%{transform:scale(1)}50%{transform:scale(1.28)}}
+.score-pill{font-size:12px;font-weight:600;color:var(--muted);background:var(--s2);border:1px solid var(--border);padding:4px 12px;border-radius:20px;}
+.score-pill em{color:var(--amber);font-style:normal;font-weight:700}
+.timer-wrap{margin-left:auto;position:relative;width:38px;height:38px}
+.timer-wrap svg{position:absolute;top:0;left:0;transform:rotate(-90deg)}
+.t-track{fill:none;stroke:var(--s3);stroke-width:3}
+.t-arc{fill:none;stroke:var(--amber);stroke-width:3;stroke-linecap:round;stroke-dasharray:107;transition:stroke-dashoffset 1s linear,stroke .3s}
+.t-label{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700}
+.progress-track{height:2px;background:var(--s2);border-radius:1px;margin:0 24px;overflow:hidden}
+.progress-fill{height:100%;background:linear-gradient(90deg,var(--amber-dim),var(--amber));border-radius:1px;transition:width .5s ease}
+.mech-header{padding:14px 24px 0;display:flex;align-items:center;gap:10px}
+.mech-icon-badge{font-size:18px;width:36px;height:36px;background:var(--s2);border:1px solid var(--border);border-radius:10px;display:flex;align-items:center;justify-content:center}
+.mech-name{font-family:'Syne',sans-serif;font-size:13px;font-weight:700;color:var(--amber);letter-spacing:.06em;text-transform:uppercase}
+.mech-desc{font-size:12px;color:var(--muted);margin-top:1px}
+.scenario-badge{margin-left:auto;font-size:11px;font-weight:600;color:var(--muted);background:var(--s2);border:1px solid var(--border);padding:3px 9px;border-radius:12px}
+.scenario-body{padding:14px 24px;flex:1;display:flex;flex-direction:column;gap:14px;overflow-y:auto}
+.situation-box{background:var(--s2);border-left:3px solid var(--amber);border-radius:0 var(--r) var(--r) 0;padding:14px 16px;}
+.situation-box p{font-size:14px;line-height:1.7;color:#b0b7d4}
+/* SWIPE */
+.swipe-arena{display:flex;flex-direction:column;gap:12px;align-items:center}
+.swipe-label-row{width:100%;display:flex;justify-content:space-between;padding:0 4px}
+.swipe-label{font-size:12px;font-weight:700;letter-spacing:.05em;transition:opacity .1s}
+.swipe-label.l{color:var(--red)}.swipe-label.r{color:var(--green)}
+.swipe-card{background:var(--s2);border:1px solid var(--border2);border-radius:var(--r3);padding:20px;cursor:grab;user-select:none;touch-action:none;will-change:transform;}
+.swipe-card p{font-size:14px;line-height:1.7;color:#b0b7d4}
+.swipe-btns{display:flex;gap:10px;width:100%}
+.swipe-btn{flex:1;padding:13px 10px;border-radius:var(--r);font-size:13px;font-weight:700;border:1px solid var(--border2);background:var(--s2);transition:all .2s;}
+.swipe-btn.l-btn{color:var(--red);border-color:var(--red-border)}.swipe-btn.l-btn:hover:not(:disabled){background:var(--red-dim)}
+.swipe-btn.r-btn{color:var(--green);border-color:var(--green-border)}.swipe-btn.r-btn:hover:not(:disabled){background:var(--green-dim)}
+.swipe-btn:disabled{opacity:.4;cursor:default}
+/* TAP */
+.tap-intro{font-size:13px;color:var(--muted);font-style:italic;margin-bottom:4px}
+.tap-paragraph{background:var(--s2);border:1px solid var(--border);border-radius:var(--r2);padding:18px 20px;line-height:2;font-size:14px;color:#b0b7d4}
+.tap-sentence{cursor:pointer;border-radius:6px;padding:2px 4px;margin:-2px -4px;transition:background .15s,color .15s;display:inline;}
+.tap-sentence:hover{background:rgba(240,165,0,.12);color:var(--text)}
+.tap-sentence.correct-s{background:rgba(31,190,106,.2);color:#6effa8}
+.tap-sentence.wrong-s{background:rgba(232,68,90,.2);color:#ffa0aa}
+.tap-sentence.dim-s{opacity:.35}
+/* BUCKET */
+.bucket-pool{display:flex;flex-wrap:wrap;gap:8px;background:var(--s2);border:1px solid var(--border);border-radius:var(--r2);padding:14px;min-height:56px;}
+.bucket-pool-label{font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);font-weight:600;width:100%;margin-bottom:2px}
+.bucket-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.bucket-zone{background:var(--s2);border:2px dashed var(--border);border-radius:var(--r2);padding:12px;min-height:110px;transition:border-color .2s,background .2s;}
+.bucket-zone.drag-over{border-color:var(--amber);background:var(--amber-glow)}
+.bucket-zone-label{font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin-bottom:8px}
+.bucket-zone-label.ba{color:var(--green)}.bucket-zone-label.bb{color:var(--red)}
+.bucket-zone-items{display:flex;flex-direction:column;gap:6px;min-height:50px}
+.bucket-chip{display:flex;align-items:center;gap:8px;background:var(--s3);border:1px solid var(--border2);border-radius:10px;padding:8px 10px;font-size:12px;font-weight:500;color:var(--text);cursor:grab;user-select:none;touch-action:none;transition:border-color .15s,opacity .15s;width:100%}
+.bucket-chip .chip-drag{color:var(--muted);font-size:14px;flex-shrink:0}
+.bucket-chip.dragging-source{opacity:.2}
+.bucket-chip.correct-c{border-color:var(--green-border);background:var(--green-dim);color:#6effa8}
+.bucket-chip.wrong-c{border-color:var(--red-border);background:var(--red-dim);color:#ffa0aa}
+/* SLIDER */
+.slider-labels{display:flex;justify-content:space-between;font-size:11px;font-weight:600;color:var(--muted)}
+.slider-track-wrap{position:relative;padding:8px 0}
+.bias-slider{-webkit-appearance:none;appearance:none;width:100%;height:6px;border-radius:3px;outline:none;cursor:pointer;background:linear-gradient(90deg,var(--green),var(--amber),var(--red));}
+.bias-slider::-webkit-slider-thumb{-webkit-appearance:none;width:22px;height:22px;border-radius:50%;background:#fff;border:3px solid var(--amber);box-shadow:0 2px 8px rgba(0,0,0,.4);cursor:grab;}
+.bias-slider::-moz-range-thumb{width:22px;height:22px;border-radius:50%;background:#fff;border:3px solid var(--amber);cursor:grab;}
+.correct-zone{position:absolute;height:6px;border-radius:3px;background:rgba(31,190,106,.5);top:8px;display:none;pointer-events:none;}
+.slider-value-display{text-align:center;font-family:'Syne',sans-serif;font-size:24px;font-weight:800;color:var(--amber);margin:4px 0}
+.slider-value-display span{font-size:13px;color:var(--muted);font-family:'DM Sans',sans-serif;font-weight:400}
+/* RANKING */
+.ranking-list{display:flex;flex-direction:column;gap:8px}
+.rank-row{display:flex;align-items:center;gap:10px;background:var(--s2);border:1px solid var(--border2);border-radius:var(--r);padding:12px 14px;user-select:none;transition:border-color .15s;}
+.rank-row.is-dragging{opacity:.2}
+.rank-row.drag-above{border-top:2px solid var(--amber)}
+.rank-row.drag-below{border-bottom:2px solid var(--amber)}
+.rank-num{font-family:'Syne',sans-serif;font-size:16px;font-weight:800;color:var(--muted);min-width:20px;text-align:center}
+.rank-handle{font-size:16px;color:var(--subtle);cursor:grab;touch-action:none;padding:0 2px;}
+.rank-text{font-size:13px;color:#b0b7d4;line-height:1.5;flex:1}
+.rank-row.correct-r{border-color:var(--green-border);background:var(--green-dim)}
+.rank-row.correct-r .rank-num{color:var(--green)}
+.rank-row.wrong-r{border-color:var(--red-border);background:var(--red-dim)}
+.rank-row.wrong-r .rank-num{color:var(--red)}
+.rank-instruction{font-size:12px;color:var(--muted);text-align:center;font-style:italic}
+/* SHARED */
+.submit-btn{width:100%;padding:13px;border-radius:var(--r);font-family:'Syne',sans-serif;font-size:14px;font-weight:700;background:var(--amber);color:#0c0d12;transition:all .2s;border:none;}
+.submit-btn:disabled{background:var(--s3);color:var(--muted);cursor:default}
+.submit-btn:not(:disabled):hover{box-shadow:0 6px 24px rgba(240,165,0,.3)}
+/* FEEDBACK */
+.feedback-area{padding:0 24px 20px;display:flex;flex-direction:column;gap:10px;animation:slideUp .3s ease}
+@keyframes slideUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+.feedback-box{border-radius:var(--r2);padding:14px 16px;border:1px solid}
+.feedback-box.fb-correct{border-color:var(--green-border);background:var(--green-dim)}
+.feedback-box.fb-wrong{border-color:var(--red-border);background:var(--red-dim)}
+.feedback-box.fb-timeout{border-color:rgba(90,95,122,.4);background:rgba(90,95,122,.08)}
+.fb-head{display:flex;align-items:center;gap:8px;margin-bottom:5px}
+.fb-head strong{font-family:'Syne',sans-serif;font-size:14px;color:var(--text)}
+.fb-body{font-size:13px;color:var(--muted);line-height:1.65}
+.pts-flash{font-family:'Syne',sans-serif;font-size:13px;font-weight:800;color:var(--amber);margin-left:auto;}
+.next-btn{width:100%;padding:14px;border-radius:var(--r);font-family:'Syne',sans-serif;font-size:15px;font-weight:700;background:var(--s2);border:1px solid var(--border);color:var(--text);transition:all .2s;display:flex;align-items:center;justify-content:center;gap:8px}
+.next-btn:hover{background:var(--amber);color:#0c0d12;border-color:var(--amber)}
+.speed-toast{position:fixed;top:20px;right:20px;background:var(--amber);color:#0c0d12;font-family:'Syne',sans-serif;font-size:13px;font-weight:800;padding:6px 14px;border-radius:20px;z-index:1000;animation:toastAnim 2s ease forwards;pointer-events:none}
+@keyframes toastAnim{0%{opacity:0;transform:translateY(-10px)}15%{opacity:1;transform:translateY(0)}75%{opacity:1}100%{opacity:0;transform:translateY(-10px)}}
+/* END */
+#se{display:none;flex-direction:column;flex:1;padding:36px 32px;gap:20px}
+.end-ring-wrap{display:flex;align-items:center;gap:20px}
+.end-ring{position:relative;width:90px;height:90px;flex-shrink:0}
+.end-ring svg{transform:rotate(-90deg)}
+.r-track{fill:none;stroke:var(--s2);stroke-width:5}
+.r-fill{fill:none;stroke:var(--amber);stroke-width:5;stroke-linecap:round;stroke-dasharray:270;transition:stroke-dashoffset 1.2s ease}
+.ring-inner{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.ring-big{font-family:'Syne',sans-serif;font-size:26px;font-weight:800;color:var(--amber);line-height:1}
+.ring-denom{font-size:12px;color:var(--muted)}
+.end-copy h2{font-size:20px;color:#fff;margin-bottom:5px}
+.end-copy p{font-size:13px;color:var(--muted);line-height:1.6}
+.end-pts{font-size:12px;color:var(--muted);text-align:center}
+.end-pts em{color:var(--amber);font-style:normal;font-weight:700}
+.breakdown-title{font-family:'Syne',sans-serif;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:12px}
+.breakdown-row{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border)}
+.breakdown-row:last-child{border:none}
+.bk-icon{font-size:16px;width:24px;text-align:center}
+.bk-name{font-size:13px;font-weight:500;flex:1}
+.bk-bar{width:70px;height:5px;background:var(--s2);border-radius:3px;overflow:hidden}
+.bk-fill{height:100%;border-radius:3px}
+.bk-pct{font-size:12px;font-weight:700;min-width:30px;text-align:right}
+.end-actions{display:flex;gap:10px;margin-top:auto}
+.end-btn-sec{flex:1;padding:13px;border-radius:var(--r);border:1px solid var(--border);background:var(--s2);color:var(--text);font-family:'Syne',sans-serif;font-size:13px;font-weight:700;transition:all .2s;cursor:pointer}
+.end-btn-sec:hover{border-color:var(--amber);color:var(--amber)}
+.end-btn-pri{flex:1;padding:13px;border-radius:var(--r);border:none;background:var(--amber);color:#0c0d12;font-family:'Syne',sans-serif;font-size:13px;font-weight:800;transition:all .2s;cursor:pointer}
+.end-btn-pri:hover{box-shadow:0 6px 24px rgba(240,165,0,.3)}
+</style>
+</head>
+<body>
+<div class="card" id="main-card">
+
+<div id="ss">
+  <div class="icon-box">🧠</div>
+  <div>
+    <div class="card-label">Cognitive Training · 5 min</div>
+    <h1>The <span>Bias</span> Breaker</h1>
+  </div>
+  <p class="tagline">Your brain runs on shortcuts that cost you money, relationships, and clear thinking. Six scenarios. Five different ways to train your rational mind.</p>
+  <div class="info-grid">
+    <div class="info-pill"><strong>8</strong><span>Scenarios</span></div>
+    <div class="info-pill"><strong>5</strong><span>Mechanics</span></div>
+    <div class="info-pill"><strong>3</strong><span>Difficulty Tiers</span></div>
+  </div>
+  <div class="model-box">
+    <div class="lbl">Five ways to play</div>
+    <div class="mechanics-row">
+      <span class="mech-chip">⬅️ Swipe</span>
+      <span class="mech-chip">👆 Tap the Bias</span>
+      <span class="mech-chip">🗂️ Sort</span>
+      <span class="mech-chip">🎚️ Calibrate</span>
+      <span class="mech-chip">↕️ Rank</span>
+    </div>
+  </div>
+  <button class="start-btn" onclick="app.start()">Start the Drill ⚡</button>
+</div>
+
+<div id="sd">
+  <div class="drill-header">
+    <div class="top-row">
+      <div class="diff-badge d2" id="diff-badge">Analyst</div>
+      <div class="streak-badge" id="streak-badge">🔥 <span id="streak-num">0</span></div>
+      <div class="score-pill">Score <em id="score-num">0</em></div>
+      <div class="timer-wrap">
+        <svg width="38" height="38" viewBox="0 0 38 38">
+          <circle class="t-track" cx="19" cy="19" r="17"/>
+          <circle class="t-arc" id="t-arc" cx="19" cy="19" r="17"/>
+        </svg>
+        <div class="t-label" id="t-label">-</div>
+      </div>
+    </div>
+    <div class="progress-track"><div class="progress-fill" id="prog-fill" style="width:0%"></div></div>
+  </div>
+  <div class="mech-header">
+    <div class="mech-icon-badge" id="mech-icon">?</div>
+    <div>
+      <div class="mech-name" id="mech-name">Loading</div>
+      <div class="mech-desc" id="mech-desc"></div>
+    </div>
+    <div class="scenario-badge" id="scenario-badge">1 / 6</div>
+  </div>
+  <div class="scenario-body" id="scenario-body"></div>
+  <div class="feedback-area" id="feedback-area" style="display:none"></div>
+</div>
+
+<div id="se">
+  <div class="end-ring-wrap">
+    <div class="end-ring">
+      <svg width="90" height="90" viewBox="0 0 90 90">
+        <circle class="r-track" cx="45" cy="45" r="43"/>
+        <circle class="r-fill" id="end-ring-fill" cx="45" cy="45" r="43" style="stroke-dashoffset:270"/>
+      </svg>
+      <div class="ring-inner">
+        <div class="ring-big" id="end-correct">0</div>
+        <div class="ring-denom" id="end-denom">/ 6</div>
+      </div>
+    </div>
+    <div class="end-copy">
+      <h2 id="end-title">-</h2>
+      <p id="end-msg">-</p>
+    </div>
+  </div>
+  <div class="end-pts" id="end-pts"></div>
+  <div>
+    <div class="breakdown-title">Bias Breakdown by Category</div>
+    <div id="breakdown-list"></div>
+  </div>
+  <div class="end-actions">
+    <button class="end-btn-sec" onclick="app.restart(false)">🔄 Same Level</button>
+    <button class="end-btn-pri" onclick="app.restart(true)">Go Harder ↗</button>
+  </div>
+</div>
+</div>
+
+<script>
+const SC=[
+{id:'sunk',cat:'Work',diff:2,
+ swipe:{situation:"You're 6 months and $50,000 into a buggy software rollout. A competitor just released a superior, cheaper alternative. What do you do?",left:{label:'✂️ Cut Losses & Switch',correct:true},right:{label:'💪 Push Forward',correct:false},feedback:"Sunk Cost Fallacy. The money and time are already gone — unrecoverable. Rational decisions must be based entirely on future value, not past investment."},
+ tap:{intro:"Your project manager argues for continuing the rollout:",sentences:[{text:"The competitor's tool costs 40% less and has zero critical bugs."},{text:"Our current software has caused three client complaints this month."},{text:"We can't abandon this now — we've already sunk six months into it.",isBias:true},{text:"The migration would take approximately two weeks."}],feedback:"'We've already sunk X into it' is never a valid reason to continue. Only future costs and benefits should drive the decision — that's Sunk Cost Fallacy."},
+ bucket:{situation:"Should you continue a failing $50k project? Sort these thoughts:",heads:['🧠 Rational Thinking','🤖 Cognitive Autopilot'],items:[{text:"What's the future ROI of each option?",b:0},{text:"We can't waste 6 months of hard work.",b:1},{text:"The competitor tool solves the problem better.",b:0},{text:"Switching now means admitting defeat.",b:1},{text:"What do our users actually need right now?",b:0}],feedback:"Rational thinking focuses on future outcomes only. Any thought anchored to 'we already spent...' is autopilot — past costs are gone regardless."},
+ slider:{situation:"A manager continues a failing project solely because 'we've already spent $50,000 and six months on it.' Rate this reasoning:",min:'Perfectly Rational',max:'Completely Biased',range:[78,95],feedback:"Highly biased — textbook Sunk Cost Fallacy. The $50k is gone either way. Continuing compounds the loss; it never recovers it."},
+ ranking:{situation:"Your $50k software rollout is failing. Rank from MOST BIASED to MOST RATIONAL:",items:[{text:"Continue — we've already spent $50k and 6 months on this.",rank:1},{text:"Run both systems in parallel for 3 months then decide.",rank:2},{text:"Evaluate the competitor tool on objective merit; switch if it's better.",rank:3}],feedback:"Continuing because of past investment is Sunk Cost. Running both delays the problem. Objective evaluation is the only rational path."}
+},
+{id:'halo',cat:'Work',diff:1,
+ swipe:{situation:"A Harvard-educated, charming candidate applies for your data analyst role. You haven't tested their skills. Do you hire them on the spot?",left:{label:'✅ Hire — they feel brilliant',correct:false},right:{label:'🧪 Test Their Skills First',correct:true},feedback:"The Halo Effect: one positive trait (prestige, charm) colours judgment of unrelated traits. The actual competency required was never measured."},
+ tap:{intro:"You're reviewing your hiring decision internally:",sentences:[{text:"The role requires advanced SQL and statistical modelling skills."},{text:"They graduated from Harvard and presented themselves brilliantly."},{text:"Someone this impressive clearly has the technical depth we need.",isBias:true},{text:"We should send a skills test before making an offer."}],feedback:"'Clearly has skills' based on presentation is assumption, not evidence. Prestige and charm are unrelated to SQL proficiency — that's the Halo Effect."},
+ bucket:{situation:"You're hiring a data analyst. Sort these inputs:",heads:['✅ Valid Signal','❌ Bias at Work'],items:[{text:"Blind-graded SQL test results",b:0},{text:"They went to an Ivy League school",b:1},{text:"Great handshake and strong eye contact",b:1},{text:"Work sample: analyse this messy dataset",b:0},{text:"Their confidence makes them feel senior",b:1}],feedback:"Only blind, skill-based signals are valid. Everything else (charisma, prestige, 'feel') is the Halo Effect inferring unrelated competencies from one positive trait."},
+ slider:{situation:"A hiring manager offers the job without a skills test because the candidate 'just seems brilliant.' Rate this reasoning:",min:'Perfectly Rational',max:'Completely Biased',range:[72,92],feedback:"Highly biased — pure Halo Effect. One positive impression is being used to infer unrelated competencies. The actual skill needed was never tested."},
+ ranking:{situation:"Hiring a data analyst. Rank from MOST BIASED to MOST RATIONAL:",items:[{text:"Hire based on their Ivy League degree and great first impression.",rank:1},{text:"Run a structured interview with standardised questions.",rank:2},{text:"Send a blind-graded technical test relevant to the role.",rank:3}],feedback:"Hiring on impression is pure Halo Effect. Structured interviews reduce bias. Blind technical tests measure the only thing that actually matters."}
+},
+{id:'confirm',cat:'Work',diff:2,
+ swipe:{situation:"You've pitched a bold strategy. You open your browser to research it. Which do you search for?",left:{label:'💀 Failure Cases First',correct:true},right:{label:'🏆 Success Stories',correct:false},feedback:"Confirmation Bias filters out contradictory information. You already believe in the strategy. Hunting failures is how you actually stress-test an idea."},
+ tap:{intro:"A colleague watches you research your new strategy:",sentences:[{text:"You've found three great case studies of companies who used this approach successfully."},{text:"This is solid research — but have you looked at why others failed with it?"},{text:"I'm sure those failures are edge cases — our situation is different.",isBias:true},{text:"Let me pull the failure data so we have the full picture."}],feedback:"Dismissing failure cases as 'edge cases' without examining them is Confirmation Bias — filtering evidence to protect a conclusion you've already reached."},
+ bucket:{situation:"You're evaluating a strategy you've already pitched. Sort these behaviours:",heads:['🧠 Rational Research','🤖 Confirmation Bias'],items:[{text:"Search for companies that failed using this approach",b:0},{text:"Dismiss critics as 'not understanding the vision'",b:1},{text:"Ask the most sceptical person you know to poke holes",b:0},{text:"Collect only success stories as supporting evidence",b:1},{text:"Pre-define what evidence would change your mind",b:0}],feedback:"Rational research seeks disconfirmation. Confirmation Bias collects only what supports existing belief. Seeking failures is where real risk lives."},
+ slider:{situation:"A strategist presents 12 success stories but no failure cases. When challenged they say 'failures were different circumstances' — without checking. Rate this:",min:'Perfectly Rational',max:'Completely Biased',range:[68,88],feedback:"Significantly biased — Confirmation Bias plus motivated reasoning. The failure dismissal was made without examining the failures. That's filtering, not analysis."},
+ ranking:{situation:"Researching your own strategy pitch. Rank from MOST BIASED to MOST RATIONAL:",items:[{text:"Collect 10 success stories; skip failure cases as 'irrelevant'.",rank:1},{text:"Research both successes and failures, but focus more on successes.",rank:2},{text:"Actively seek out failure cases first, then compare conditions.",rank:3}],feedback:"Collecting only successes is textbook Confirmation Bias. Mixed research is better but still weighted wrong. Seeking failures first is where actual risk information lives."}
+},
+{id:'anchor',cat:'Money',diff:2,
+ swipe:{situation:"The recruiter opens at $65,000. Your market research says $90,000. What do you counter with?",left:{label:'📊 State my $90k data',correct:true},right:{label:'↕️ Negotiate from $65k',correct:false},feedback:"Anchoring Bias: the first number mentioned pulls all subsequent estimates toward it. Negotiating from their anchor means operating on their turf."},
+ tap:{intro:"You're negotiating salary. Your internal monologue:",sentences:[{text:"The market rate for this role is $90,000 based on my research."},{text:"They opened at $70,000, which is $20k under what I want."},{text:"I'll push for $78,000 — that's a solid win from their starting point.",isBias:true},{text:"I should state my $90,000 target and justify it with market data."}],feedback:"$78k feels like a win because you're measuring against their anchor ($70k) — not the $90k you deserve. Never negotiate from their number."},
+ bucket:{situation:"Salary negotiation. Recruiter opens at $65k, your research says $85k. Sort these thoughts:",heads:['🧠 Anchor-Free','⚓ Caught by the Anchor'],items:[{text:"I'll ask for $72k — great jump from their $65k.",b:1},{text:"Their $65k opening is irrelevant. My data says $85k.",b:0},{text:"I'll counter at $75k — meet in the middle.",b:1},{text:"I'll state $85k and explain the market data behind it.",b:0}],feedback:"'Great jump from their number' and 'meet in the middle' are both anchored to their opening. Rational negotiation starts from an independent reference point."},
+ slider:{situation:"A buyer negotiates a car from the dealer's $30k asking price down to $27.5k and feels satisfied — but market value is $24k. Rate their reasoning:",min:'Perfectly Rational',max:'Completely Biased',range:[73,93],feedback:"Highly biased — classic Anchoring. The buyer measures success against the seller's anchor, not actual market value. They overpaid by $3,500 while feeling great."},
+ ranking:{situation:"Recruiter opens salary at $65k. Your market rate is $90k. Rank from MOST BIASED to MOST RATIONAL:",items:[{text:"'I'll take $72k' — feeling good about the jump from their offer.",rank:1},{text:"'How about $80k?' — splitting the difference to seem fair.",rank:2},{text:"'Based on market data, the rate for this role is $90k.' State your own anchor.",rank:3}],feedback:"Accepting near their number is pure Anchoring. Splitting the difference is still anchored. Stating your own independent data point is the only way to break free."}
+},
+{id:'avail',cat:'Everyday',diff:1,
+ swipe:{situation:"You've spent an hour reading dramatic news about plane crashes. Your upcoming flight now feels terrifying. What do you do?",left:{label:'🚫 Cancel the Flight',correct:false},right:{label:'📊 Check Actual Statistics',correct:true},feedback:"Availability Bias: our brains judge likelihood by how easily a vivid example comes to mind. Dramatic news is memorable — not statistically representative."},
+ tap:{intro:"A friend rationalises cancelling their flight:",sentences:[{text:"Commercial flying has a fatality rate of 0.07 per billion passenger miles."},{text:"I just watched a three-part documentary about the worst aviation disasters."},{text:"I feel like crashes are happening way more often lately — flying just feels too risky.",isBias:true},{text:"Statistically, the drive to the airport is more dangerous than the flight itself."}],feedback:"'Feels like it's happening more often' after consuming vivid crash content is your brain confusing memorability with frequency. The statistics haven't changed."},
+ bucket:{situation:"After a news story about a shark attack, you're reassessing your beach trip. Sort these thoughts:",heads:['📊 Statistical Thinking','🎭 Availability Bias'],items:[{text:"Shark attacks kill ~5 people globally per year.",b:0},{text:"That news story makes attacks feel like they're everywhere.",b:1},{text:"The odds of being attacked are 1 in 3.75 million.",b:0},{text:"I can picture it so vividly — it must be a real risk.",b:1},{text:"My personal risk hasn't changed because of one news story.",b:0}],feedback:"Statistical thinking uses base rates. Availability Bias inflates risk perception when dramatic events are easy to recall — regardless of actual frequency."},
+ slider:{situation:"After a dramatic news week on crime, someone rates their neighbourhood as 'extremely dangerous' — despite crime rates declining for 5 years. Rate this reasoning:",min:'Perfectly Rational',max:'Completely Biased',range:[65,85],feedback:"Significantly biased — vivid news stories distort the risk assessment. The underlying trend (declining crime) is the relevant data. The news cycle is not."},
+ ranking:{situation:"After reading about a local mugging, assessing how safe your area is. Rank from MOST BIASED to MOST RATIONAL:",items:[{text:"Cancel your evening walk — that mugging proves it's not safe.",rank:1},{text:"Feel uneasy but go anyway, aware your instinct may be off.",rank:2},{text:"Check the actual crime statistics for your area, then decide.",rank:3}],feedback:"Cancelling based on one vivid story is pure Availability Bias. Checking actual statistics is the only data-driven risk assessment."}
+},
+{id:'loss',cat:'Work',diff:2,
+ swipe:{situation:"You're offered a 40% pay raise at a new company. You'd leave 5 years of comfort behind. Your gut says 'don't risk it.' Do you follow your gut?",left:{label:'😰 Stay Safe',correct:false},right:{label:'📊 Evaluate Rationally',correct:true},feedback:"Loss Aversion: we feel the pain of a potential loss about twice as intensely as an equivalent gain. That gut scream is your brain weighting the downside double."},
+ tap:{intro:"You're talking yourself out of taking the promotion:",sentences:[{text:"The new role offers a 40% salary increase and faster career progression."},{text:"I've built strong relationships here over five years."},{text:"Losing what I have feels so much worse than gaining what they're offering.",isBias:true},{text:"I should compare both paths on objective metrics before deciding."}],feedback:"'Losing what I have feels worse than gaining what's offered' is Loss Aversion in real time. The 2:1 loss bias is speaking — not rational evaluation."},
+ bucket:{situation:"Deciding whether to take a high-upside new job. Sort these thoughts:",heads:['🧠 Rational Evaluation','😰 Loss Aversion'],items:[{text:"What's the 5-year career trajectory of each path?",b:0},{text:"I'd lose my safety net — that feels unbearable.",b:1},{text:"Compare salaries, growth rate, and skill development.",b:0},{text:"What if the new place is toxic and I regret leaving?",b:1},{text:"What's the actual failure probability if I take the leap?",b:0}],feedback:"Rational evaluation weighs upside and downside symmetrically. Loss Aversion inflates the downside — 'losing safety' feels more real than 'gaining 40%'."},
+ slider:{situation:"A person turns down a 40% raise because 'losing the comfort of my current job feels worse than the potential gain.' Rate this reasoning:",min:'Perfectly Rational',max:'Completely Biased',range:[60,80],feedback:"Moderately-to-highly biased — Loss Aversion distorts the decision. Discomfort of loss is being weighted double the value of an equivalent gain."},
+ ranking:{situation:"Offered a 40% pay raise at a new company. Rank from MOST BIASED to MOST RATIONAL:",items:[{text:"Decline immediately — losing your current stability feels too painful.",rank:1},{text:"Ask for time, then build a pro/con list weighted toward safety.",rank:2},{text:"Build an objective comparison: salary, growth, risk probability, worst-case.",rank:3}],feedback:"Declining out of fear is pure Loss Aversion. A safety-weighted list is better but still biased. A symmetrically-weighted objective comparison is the only rational move."}
+},
+{id:'action',cat:'Work',diff:2,
+ swipe:{situation:"A major client emails threatening to cancel. Your heart is pounding. What do you do?",left:{label:'📨 Reply Immediately',correct:false},right:{label:'⏸️ Pause & Think',correct:true},feedback:"Action Bias: under pressure, we feel an irrational urge to act immediately to relieve anxiety — even when acting makes things worse."},
+ tap:{intro:"You just received the furious client email. Your inner voice:",sentences:[{text:"The client is threatening to pull a $200,000 contract."},{text:"I feel sick and need to make this stop immediately."},{text:"I have to reply right now — doing nothing makes me look incompetent.",isBias:true},{text:"A calm, structured response in two hours will be far more effective."}],feedback:"'Have to reply right now' is anxiety driving behaviour — not strategy. The urgency is about relieving your distress, not solving the client's problem."},
+ bucket:{situation:"A major client emails threatening to cancel. Sort your immediate impulses:",heads:['🧠 Strategic Response','⚡ Action Bias'],items:[{text:"Close your laptop, breathe, and assess in 30 minutes.",b:0},{text:"Fire back a defensive reply immediately.",b:1},{text:"Draft a response, sleep on it, send tomorrow.",b:0},{text:"Call them right now just to feel like you're doing something.",b:1},{text:"Take a walk before deciding your communication strategy.",b:0}],feedback:"Strategic responses prioritise effectiveness over speed. Action Bias triggers behaviour designed to relieve anxiety — not to solve the actual crisis."},
+ slider:{situation:"A manager receives a threatening client email and immediately fires back an emotional, defensive reply to relieve their own anxiety. Rate this:",min:'Perfectly Rational',max:'Completely Biased',range:[72,92],feedback:"Highly biased — Action Bias. The immediate reply relieves the manager's anxiety but typically escalates the client's anger. A deliberate pause is the rational move."},
+ ranking:{situation:"A major client threatens to cancel via email. Rank from MOST BIASED to MOST RATIONAL:",items:[{text:"Reply immediately with an emotional, defensive email to 'do something'.",rank:1},{text:"Reply within 30 minutes with a brief acknowledgement, then follow up properly.",rank:2},{text:"Take 2 hours to calm down, fully assess, then send a structured response.",rank:3}],feedback:"Immediate emotional response is pure Action Bias. A quick acknowledgement buys time. A deliberate, calm response after cooling down is the most rational play."}
+},
+{id:'group',cat:'Work',diff:3,
+ swipe:{situation:"In a meeting, the CEO pitches a strategy. Four executives immediately agree. You spot a real flaw. What do you do?",left:{label:'😶 Stay Quiet',correct:false},right:{label:'🙋 Raise the Concern',correct:true},feedback:"Groupthink creates an illusion of consensus that overrides critical thinking. Dissent at the right moment is the most valuable contribution you can make."},
+ tap:{intro:"After the meeting where everyone agreed, you write in your journal:",sentences:[{text:"The strategy has a clear operational flaw that nobody addressed."},{text:"Four senior people agreed enthusiastically, so I assumed I must have missed something."},{text:"If I was the only one who saw a problem, I was probably just wrong.",isBias:true},{text:"I should have raised my concern — that's exactly when dissent matters most."}],feedback:"'I was probably wrong if no one else saw it' is the social proof trap. Groups suppress dissent precisely when they need it most."},
+ bucket:{situation:"You're in a meeting where the group quickly converges on a plan. Sort these impulses:",heads:['🧠 Healthy Dissent','🤐 Groupthink'],items:[{text:"Ask 'what's the strongest case against this plan?'",b:0},{text:"Everyone seems confident — I must be missing something.",b:1},{text:"Voice the flaw you spotted, clearly and calmly.",b:0},{text:"Stay quiet to avoid being the 'difficult' person.",b:1},{text:"Propose a devil's advocate role to stress-test the idea.",b:0}],feedback:"Healthy dissent protects groups from bad decisions. The most rational member is often the one willing to be temporarily unpopular."},
+ slider:{situation:"A team unanimously approves a complex plan in 10 minutes without anyone challenging it, because everyone assumed others had vetted it. Rate this process:",min:'Perfectly Rational',max:'Completely Biased',range:[65,85],feedback:"Significantly biased — Groupthink plus diffusion of responsibility. Speed of consensus is not quality. 10-minute unanimous decisions on complex plans are a red flag."},
+ ranking:{situation:"CEO presents a strategy; room quickly agrees. You see a real flaw. Rank from MOST BIASED to MOST RATIONAL:",items:[{text:"Nod along — if five smart people agree, you must be wrong.",rank:1},{text:"Stay quiet but send a private concern email afterward.",rank:2},{text:"Raise the concern in the room, framed as: 'Have we considered X?'",rank:3}],feedback:"Nodding along is pure Groupthink. The private email is more honest but misses the critical moment. Public, constructive dissent in the room is when and where it matters most."}
+}];
+
+const META={
+  swipe:{icon:'⬅️',name:'SWIPE YOUR CALL',desc:'Drag the card or tap a button',timer:12},
+  tap:{icon:'👆',name:'TAP THE BIASED SENTENCE',desc:'Find where the autopilot kicks in',timer:16},
+  bucket:{icon:'🗂️',name:'SORT THE THOUGHTS',desc:'Drag each chip into the right bucket',timer:35},
+  slider:{icon:'🎚️',name:'CALIBRATE THE BIAS',desc:'Rate the reasoning on the spectrum',timer:22},
+  ranking:{icon:'↕️',name:'RANK THE RESPONSES',desc:'Drag to order most to least biased',timer:35}
+};
+
+const app={
+  session:[],mechanics:[],idx:0,score:0,streak:0,
+  diff:2,consC:0,consW:0,results:[],answered:false,
+  tick:null,timeLeft:0,forceDiff:null,
+  bState:null,rState:null,
+
+  $:id=>document.getElementById(id),
+  shuf(a){const b=[...a];for(let i=b.length-1;i>0;i--){const j=0|Math.random()*(i+1);[b[i],b[j]]=[b[j],b[i]];}return b;},
+  show(id){const e=this.$(id);e.style.display='flex';e.style.flexDirection='column';},
+  hide(id){this.$(id).style.display='none';},
+
+  start(){
+    this.idx=0;this.score=0;this.streak=0;
+    this.diff=this.forceDiff||2;this.consC=0;this.consW=0;this.results=[];
+    this.session=this.shuf([...SC]).slice(0,6);
+    const all=['swipe','tap','bucket','slider','ranking'];
+    let m=this.shuf([...all]);
+    m.push(all[0|Math.random()*5]);
+    for(let i=1;i<m.length;i++){if(m[i]===m[i-1]){const s=(i+1)%m.length;[m[i],m[s]]=[m[s],m[i]];}}
+    this.mechanics=m;
+    this.hide('ss');this.show('sd');
+    this.updDiff();
+    this.$('score-num').textContent='0';this.$('streak-num').textContent='0';
+    this.load();
+  },
+
+  updDiff(){
+    const l={1:'Rookie',2:'Analyst',3:'Expert'},c={1:'d1',2:'d2',3:'d3'};
+    const b=this.$('diff-badge');b.textContent=l[this.diff];b.className='diff-badge '+c[this.diff];
+  },
+  adapt(ok){
+    if(ok){this.consW=0;this.consC++;if(this.consC>=2&&this.diff<3){this.diff++;this.consC=0;this.updDiff();}}
+    else{this.consC=0;this.consW++;if(this.consW>=2&&this.diff>1){this.diff--;this.consW=0;this.updDiff();}}
+  },
+
+  startTimer(s){
+    this.stopTimer();this.timeLeft=s;
+    const arc=this.$('t-arc'),lbl=this.$('t-label'),C=2*Math.PI*17;
+    const tick=()=>{
+      const p=this.timeLeft/s;
+      arc.style.strokeDashoffset=C*(1-p);
+      arc.style.stroke=this.timeLeft<=5?'var(--red)':'var(--amber)';
+      lbl.style.color=this.timeLeft<=5?'var(--red)':'var(--text)';
+      lbl.textContent=this.timeLeft;
+    };
+    tick();
+    this.tick=setInterval(()=>{this.timeLeft--;tick();if(this.timeLeft<=0){this.stopTimer();this.onTimeout();}},1000);
+  },
+  stopTimer(){if(this.tick){clearInterval(this.tick);this.tick=null;}},
+  onTimeout(){
+    if(this.answered)return;
+    this.answered=true;this.adapt(false);
+    const mech=this.mechanics[this.idx];
+    this.results.push({cat:this.session[this.idx].cat,correct:false});
+    document.querySelectorAll('.swipe-btn,.bias-slider,.submit-btn').forEach(e=>{e.disabled=true;e.style.pointerEvents='none';});
+    document.querySelectorAll('.tap-sentence').forEach(e=>e.style.pointerEvents='none');
+    this.showFB(false,this.session[this.idx][mech].feedback,0,true);
+  },
+
+  load(){
+    this.answered=false;this.bState=null;this.rState=null;
+    const sc=this.session[this.idx],mech=this.mechanics[this.idx],meta=META[mech];
+    this.$('prog-fill').style.width=(this.idx/6*100)+'%';
+    this.$('scenario-badge').textContent=(this.idx+1)+' / 6';
+    this.$('mech-icon').textContent=meta.icon;
+    this.$('mech-name').textContent=meta.name;
+    this.$('mech-desc').textContent=meta.desc;
+    const body=this.$('scenario-body');body.innerHTML='';
+    const fb=this.$('feedback-area');fb.innerHTML='';fb.style.display='none';
+    this['r_'+mech](body,sc);
+    this.startTimer(meta.timer);
+  },
+
+  handleResult(ok,pts,fb){
+    if(this.answered)return;
+    this.answered=true;this.stopTimer();
+    const mech=this.mechanics[this.idx],maxT=META[mech].timer,elapsed=maxT-this.timeLeft;
+    let bonus=0;
+    if(ok){if(elapsed<=maxT*.25)bonus=50;else if(elapsed<=maxT*.5)bonus=25;}
+    if(ok){this.streak++;this.score+=pts+bonus;const sb=this.$('streak-badge');sb.classList.add('pop');setTimeout(()=>sb.classList.remove('pop'),400);}
+    else this.streak=0;
+    this.$('streak-num').textContent=this.streak;
+    this.$('score-num').textContent=this.score;
+    this.adapt(ok);
+    this.results.push({cat:this.session[this.idx].cat,correct:ok});
+    if(bonus>0){const t=document.createElement('div');t.className='speed-toast';t.textContent='⚡ Speed +'+bonus;document.body.appendChild(t);setTimeout(()=>t.remove(),2200);}
+    this.showFB(ok,fb,pts+bonus,false);
+  },
+  showFB(ok,text,pts,timeout){
+    const fb=this.$('feedback-area');
+    const cls=timeout?'fb-timeout':ok?'fb-correct':'fb-wrong';
+    const icon=timeout?'⏱️':ok?'🎯':'🪤';
+    const head=timeout?"Time's up!":ok?'Sharp thinking.':'Autopilot won.';
+    fb.innerHTML=`<div class="feedback-box ${cls}"><div class="fb-head"><span>${icon}</span><strong>${head}</strong>${pts>0?'<span class="pts-flash">+'+pts+'pts</span>':''}</div><div class="fb-body">${text}</div></div><button class="next-btn" onclick="app.next()">${this.idx<5?'Next Scenario →':'See Results →'}</button>`;
+    fb.style.display='flex';
+  },
+  next(){this.idx++;if(this.idx>=6)this.end();else this.load();},
+
+  /* SWIPE */
+  r_swipe(body,sc){
+    const d=sc.swipe;
+    body.innerHTML=`<div class="swipe-arena"><div class="swipe-label-row"><div class="swipe-label l" id="sl-l" style="opacity:.2">${d.left.label}</div><div class="swipe-label r" id="sl-r" style="opacity:.2">${d.right.label}</div></div><div style="width:100%"><div class="swipe-card" id="swipe-card"><p>${d.situation}</p></div></div><div class="swipe-btns"><button class="swipe-btn l-btn" onclick="app.doSwipe('left')">${d.left.label}</button><button class="swipe-btn r-btn" onclick="app.doSwipe('right')">${d.right.label}</button></div></div>`;
+    const card=document.getElementById('swipe-card');
+    let sX=null,cX=0,drag=false;
+    card.addEventListener('pointerdown',e=>{if(this.answered)return;e.preventDefault();sX=e.clientX;drag=true;card.setPointerCapture(e.pointerId);card.style.transition='none';});
+    card.addEventListener('pointermove',e=>{if(!drag||sX===null)return;cX=e.clientX-sX;card.style.transform=`translateX(${cX}px) rotate(${cX*.04}deg)`;const op=Math.min(Math.abs(cX)/70,1);document.getElementById('sl-l').style.opacity=cX<0?op:.2;document.getElementById('sl-r').style.opacity=cX>0?op:.2;});
+    card.addEventListener('pointerup',()=>{if(!drag)return;drag=false;if(Math.abs(cX)>80){this.doSwipe(cX<0?'left':'right');}else{card.style.transition='transform .4s ease';card.style.transform='';document.getElementById('sl-l').style.opacity='.2';document.getElementById('sl-r').style.opacity='.2';}cX=0;sX=null;});
+  },
+  doSwipe(dir){
+    if(this.answered)return;
+    const d=this.session[this.idx].swipe,ok=dir==='left'?d.left.correct:d.right.correct;
+    const card=document.getElementById('swipe-card');
+    if(card){card.style.transition='transform .4s ease,opacity .4s ease';card.style.transform=dir==='left'?'translateX(-140%) rotate(-15deg)':'translateX(140%) rotate(15deg)';card.style.opacity='0';}
+    document.querySelectorAll('.swipe-btn').forEach(b=>b.disabled=true);
+    this.handleResult(ok,100,d.feedback);
+  },
+
+  /* TAP */
+  r_tap(body,sc){
+    const d=sc.tap;
+    const html=d.sentences.map((s,i)=>`<span class="tap-sentence" data-i="${i}" data-bias="${!!s.isBias}">${s.text}</span>`).join(' ');
+    body.innerHTML=`<div class="situation-box"><p class="tap-intro">"${d.intro}"</p></div><div class="tap-paragraph">${html}</div><p style="font-size:12px;color:var(--muted);text-align:center">Tap the sentence where the bias lives</p>`;
+    document.querySelectorAll('.tap-sentence').forEach(el=>{el.addEventListener('click',()=>{if(this.answered)return;const isBias=el.dataset.bias==='true';document.querySelectorAll('.tap-sentence').forEach(s=>{s.style.pointerEvents='none';if(s.dataset.bias==='true')s.classList.add('correct-s');else if(s===el&&!isBias)s.classList.add('wrong-s');else s.classList.add('dim-s');});this.handleResult(isBias,100,d.feedback);});});
+  },
+
+  /* BUCKET */
+  r_bucket(body,sc){
+    const d=sc.bucket;
+    this.bState={items:d.items.map((it,i)=>({...it,id:i,loc:'pool'})),data:d,locked:false};
+    body.innerHTML=`<div class="situation-box"><p>${d.situation}</p></div><div><div class="bucket-pool" id="bpool"><div class="bucket-pool-label">Drag items into the buckets below</div></div></div><div class="bucket-row"><div class="bucket-zone" id="bz-0"><div class="bucket-zone-label ba">${d.heads[0]}</div><div class="bucket-zone-items" id="bzi-0"></div></div><div class="bucket-zone" id="bz-1"><div class="bucket-zone-label bb">${d.heads[1]}</div><div class="bucket-zone-items" id="bzi-1"></div></div></div><button class="submit-btn" id="bsub" disabled onclick="app.subBucket()">Check Placement</button>`;
+    this.drawBucket();
+  },
+  drawBucket(){
+    const pool=document.getElementById('bpool'),z0=document.getElementById('bzi-0'),z1=document.getElementById('bzi-1');
+    if(!pool||!z0||!z1)return;
+    const lbl=pool.querySelector('.bucket-pool-label');
+    pool.innerHTML='';if(lbl)pool.appendChild(lbl);z0.innerHTML='';z1.innerHTML='';
+    const locked=this.bState.locked;
+    this.bState.items.forEach(item=>{
+      const chip=document.createElement('div');
+      chip.className='bucket-chip'+(locked?'':' ');
+      chip.innerHTML=`<span class="chip-drag">⠿</span><span>${item.text}</span>`;
+      if(item.cp===true)chip.classList.add('correct-c');
+      if(item.cp===false)chip.classList.add('wrong-c');
+      if(!locked){
+        chip.addEventListener('pointerdown',e=>{
+          e.preventDefault();
+          const rect=chip.getBoundingClientRect(),ox=e.clientX-rect.left,oy=e.clientY-rect.top;
+          const ghost=chip.cloneNode(true);
+          ghost.style.cssText=`position:fixed;left:${rect.left}px;top:${rect.top}px;width:${rect.width}px;pointer-events:none;z-index:9999;opacity:.9;transform:rotate(2deg) scale(1.03);box-shadow:0 12px 40px rgba(0,0,0,.5);border-radius:10px;background:var(--s3);border:1px solid var(--border2);padding:8px 10px;display:flex;align-items:center;gap:8px;font-size:12px;font-weight:500;color:var(--text);`;
+          document.body.appendChild(ghost);
+          chip.classList.add('dragging-source');
+          const mv=ev=>{ghost.style.left=(ev.clientX-ox)+'px';ghost.style.top=(ev.clientY-oy)+'px';['bpool','bz-0','bz-1'].forEach(id=>{const z=document.getElementById(id);if(!z)return;z.classList.remove('drag-over');const r=z.getBoundingClientRect();if(ev.clientX>=r.left&&ev.clientX<=r.right&&ev.clientY>=r.top&&ev.clientY<=r.bottom)z.classList.add('drag-over');});};
+          const up=ev=>{document.removeEventListener('pointermove',mv);document.removeEventListener('pointerup',up);document.body.removeChild(ghost);chip.classList.remove('dragging-source');['bpool','bz-0','bz-1'].forEach(id=>{const z=document.getElementById(id);if(z)z.classList.remove('drag-over');});const cx=ev.clientX,cy=ev.clientY;const zones=[{id:'pool',el:document.getElementById('bpool')},{id:0,el:document.getElementById('bz-0')},{id:1,el:document.getElementById('bz-1')}];let dest=null;for(const z of zones){if(!z.el)continue;const r=z.el.getBoundingClientRect();if(cx>=r.left&&cx<=r.right&&cy>=r.top&&cy<=r.bottom){dest=z.id;break;}}if(dest!==null)item.loc=dest;this.drawBucket();const done=this.bState.items.every(i=>i.loc!=='pool');const sb=document.getElementById('bsub');if(sb)sb.disabled=!done;};
+          document.addEventListener('pointermove',mv);document.addEventListener('pointerup',up);
+        });
+      }
+      if(item.loc==='pool')pool.appendChild(chip);
+      else if(item.loc===0)z0.appendChild(chip);
+      else if(item.loc===1)z1.appendChild(chip);
+    });
+  },
+  subBucket(){
+    if(this.answered)return;
+    this.bState.locked=true;let correct=0;
+    this.bState.items.forEach(item=>{const ok=item.loc===item.b;item.cp=ok;if(ok)correct++;});
+    this.drawBucket();
+    const sb=document.getElementById('bsub');if(sb)sb.disabled=true;
+    const pct=correct/this.bState.items.length;
+    this.handleResult(pct>=0.6,Math.round(pct*100),this.bState.data.feedback);
+  },
+
+  /* SLIDER */
+  r_slider(body,sc){
+    const d=sc.slider;
+    body.innerHTML=`<div class="situation-box"><p>${d.situation}</p></div><div style="display:flex;flex-direction:column;gap:12px"><div class="slider-value-display" id="sv">50 <span>/ 100</span></div><div class="slider-labels"><span>📗 ${d.min}</span><span>${d.max} 📕</span></div><div class="slider-track-wrap"><div class="correct-zone" id="cz"></div><input type="range" class="bias-slider" id="bslider" min="0" max="100" value="50"></div><button class="submit-btn" onclick="app.subSlider()">Lock In My Rating</button></div>`;
+    document.getElementById('bslider').addEventListener('input',function(){document.getElementById('sv').innerHTML=this.value+' <span>/ 100</span>';});
+  },
+  subSlider(){
+    if(this.answered)return;
+    const d=this.session[this.idx].slider,val=parseInt(document.getElementById('bslider').value);
+    const [lo,hi]=d.range,inRange=val>=lo&&val<=hi,close=!inRange&&(val>=lo-15&&val<=hi+15);
+    document.getElementById('bslider').disabled=true;
+    const cz=document.getElementById('cz');
+    if(cz){cz.style.display='block';cz.style.left=lo+'%';cz.style.width=(hi-lo)+'%';}
+    this.handleResult(inRange||close,inRange?100:close?50:0,d.feedback);
+  },
+
+  /* RANKING */
+  r_ranking(body,sc){
+    const d=sc.ranking;
+    this.rState={items:this.shuf(d.items.map((it,i)=>({...it,origRank:it.rank,id:i}))),data:d,locked:false};
+    body.innerHTML=`<div class="situation-box"><p>${d.situation}</p></div><p class="rank-instruction">1 = Most Biased &nbsp;→&nbsp; ${d.items.length} = Most Rational</p><div class="ranking-list" id="rlist"></div><button class="submit-btn" onclick="app.subRanking()">Submit Order</button>`;
+    this.drawRank();
+  },
+  drawRank(){
+    const list=document.getElementById('rlist');if(!list)return;
+    list.innerHTML='';const locked=this.rState.locked;
+    this.rState.items.forEach((item,i)=>{
+      const row=document.createElement('div');
+      row.className='rank-row'+(locked?' locked':'');row.dataset.id=item.id;
+      if(locked){const c=(i+1)===item.origRank;row.classList.add(c?'correct-r':'wrong-r');}
+      row.innerHTML=`<span class="rank-num">${i+1}</span><span class="rank-handle">☰</span><span class="rank-text">${item.text}</span>`;
+      if(!locked){row.querySelector('.rank-handle').addEventListener('pointerdown',e=>this.rankDrag(e,row));}
+      list.appendChild(row);
+    });
+  },
+  rankDrag(e,row){
+    e.preventDefault();
+    const list=document.getElementById('rlist');if(!list)return;
+    const id=row.dataset.id,rect=row.getBoundingClientRect(),oy=e.clientY-rect.top;
+    const ghost=row.cloneNode(true);
+    ghost.style.cssText=`position:fixed;left:${rect.left}px;top:${rect.top}px;width:${rect.width}px;height:${rect.height}px;pointer-events:none;z-index:9999;opacity:.9;transform:rotate(1deg);box-shadow:0 8px 32px rgba(0,0,0,.5);border-radius:var(--r);background:var(--s2);border:1px solid var(--border2);display:flex;align-items:center;gap:10px;padding:12px 14px;`;
+    document.body.appendChild(ghost);row.classList.add('is-dragging');
+    let cur=null;
+    const mv=ev=>{
+      ghost.style.top=(ev.clientY-oy)+'px';
+      const cy=ev.clientY,rows=[...list.querySelectorAll('.rank-row:not(.is-dragging)')];
+      let no=null;for(const r of rows){const rr=r.getBoundingClientRect();if(cy<rr.top+rr.height/2){no=r;break;}}
+      if(no!==cur){rows.forEach(r=>r.classList.remove('drag-above','drag-below'));if(no)no.classList.add('drag-above');else if(rows.length)rows[rows.length-1].classList.add('drag-below');cur=no;}
+    };
+    const up=ev=>{
+      document.removeEventListener('pointermove',mv);document.removeEventListener('pointerup',up);
+      document.body.removeChild(ghost);row.classList.remove('is-dragging');
+      document.querySelectorAll('.rank-row').forEach(r=>r.classList.remove('drag-above','drag-below'));
+      const fromIdx=this.rState.items.findIndex(i=>i.id===parseInt(id));if(fromIdx===-1){this.drawRank();return;}
+      const rows=[...list.querySelectorAll('.rank-row:not(.is-dragging)')];
+      const cy=ev.clientY;let toIdx=this.rState.items.length;
+      for(let i=0;i<rows.length;i++){const rr=rows[i].getBoundingClientRect();if(cy<rr.top+rr.height/2){toIdx=this.rState.items.findIndex(it=>it.id===parseInt(rows[i].dataset.id));break;}}
+      const [moved]=this.rState.items.splice(fromIdx,1);
+      this.rState.items.splice(Math.max(0,toIdx>fromIdx?toIdx-1:toIdx),0,moved);
+      this.drawRank();
+    };
+    document.addEventListener('pointermove',mv);document.addEventListener('pointerup',up);
+  },
+  subRanking(){
+    if(this.answered)return;
+    this.rState.locked=true;let correct=0;
+    this.rState.items.forEach((item,i)=>{if((i+1)===item.origRank)correct++;});
+    this.drawRank();
+    document.querySelectorAll('.submit-btn').forEach(b=>b.disabled=true);
+    const pct=correct/this.rState.items.length;
+    this.handleResult(pct>=0.5,Math.round(pct*100),this.rState.data.feedback);
+  },
+
+  end(){
+    this.hide('sd');this.show('se');
+    const correct=this.results.filter(r=>r.correct).length,total=this.results.length,pct=correct/total;
+    setTimeout(()=>{this.$('end-ring-fill').style.strokeDashoffset=270*(1-pct);},80);
+    this.$('end-correct').textContent=correct;this.$('end-denom').textContent='/ '+total;
+    const titles=['Keep drilling.','Getting warmer.','Sharp instincts.','Impressive.','Bias-proof.'];
+    const msgs=['Your autopilot ran the show. More reps will change that.','You caught some traps. A few slipped through. Stay at it.',"Good instincts. You're starting to see the glitches before they cost you.",'You overrode your autopilot most of the time. That\'s the real skill.','Flawless. Your slow, deliberate mind is fully in charge.'];
+    const tier=Math.min(4,Math.floor(pct*5));
+    this.$('end-title').textContent=titles[tier];this.$('end-msg').textContent=msgs[tier];
+    this.$('end-pts').innerHTML='Total score: <em>'+this.score+' points</em>';
+    const cats={};this.results.forEach(r=>{if(!cats[r.cat])cats[r.cat]={c:0,t:0};cats[r.cat].t++;if(r.correct)cats[r.cat].c++;});
+    const icons={Work:'💼',Money:'💰',Everyday:'🌀',Relationships:'💑',Health:'🏃'};
+    const sorted=Object.entries(cats).sort((a,b)=>(a[1].c/a[1].t)-(b[1].c/b[1].t));
+    const bl=this.$('breakdown-list');bl.innerHTML='';
+    sorted.forEach(([cat,data])=>{const p=Math.round(data.c/data.t*100),color=p>=70?'var(--green)':p>=40?'var(--amber)':'var(--red)';const row=document.createElement('div');row.className='breakdown-row';row.innerHTML=`<span class="bk-icon">${icons[cat]||'🔹'}</span><span class="bk-name">${cat}</span><div class="bk-bar"><div class="bk-fill" style="width:${p}%;background:${color}"></div></div><span class="bk-pct" style="color:${color}">${p}%</span>`;bl.appendChild(row);});
+  },
+
+  restart(harder){
+    this.hide('se');
+    if(harder)this.forceDiff=Math.min(3,(this.forceDiff||2)+1);else this.forceDiff=null;
+    this.start();
+  }
+};
+</script>
+</body>
+</html>
